@@ -1,0 +1,77 @@
+/* Design tokens. Colours are chosen to stay distinguishable for colour-blind readers. */
+:root {
+  color-scheme: light dark;
+
+  --bg: #fbfaf7;
+  --surface: #ffffff;
+  --text: #1c1f24;
+  --text-muted: #5b6270;
+  --border: #e3e1da;
+  --accent: #2563eb;
+
+  /* Algorithm state colours, shared by every figure. */
+  --state-unvisited: #a3a8b3;
+  --state-frontier: #f59e0b;
+  --state-settled: #2563eb;
+  --edge-negative: #dc2626;
+  --edge-tree: #1c1f24;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+  --radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a;
+    --surface: #1c1f25;
+    --text: #e8e9ec;
+    --text-muted: #a0a6b2;
+    --border: #2e323a;
+    --accent: #6b9bff;
+
+    --state-unvisited: #6b7280;
+    --state-frontier: #fbbf24;
+    --state-settled: #6b9bff;
+    --edge-negative: #f87171;
+    --edge-tree: #e8e9ec;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+}
+
+a {
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
