@@ -16,6 +16,11 @@ export const GLOSSARY = {
   'negative-edge': 'An edge with a weight below zero: using it makes the route cheaper, like a refund or a downhill slide.',
   'negative-cycle':
     'A loop whose weights add up to less than zero. Going round it again and again makes a route as cheap as you like, so "shortest" stops making sense.',
+  potential:
+    'A number given to each vertex (also called a price or height). Adding the start’s height and subtracting the end’s from every edge changes all routes between two points by the same amount, so the best route stays the best.',
+  eta: 'η (the Greek letter eta): the largest number of negative edges that any vertex’s shortest route needs. The hybrid algorithm takes at most η + 1 rounds.',
+  'a-star':
+    'A*: Dijkstra with a guess (a heuristic) of the remaining distance to the goal, so it explores towards the goal first. Widely used for pathfinding in games.',
   'big-o':
     'A way to say how the work grows with the size of the input, ignoring constant factors. O(m) means "proportional to the number of edges".',
   log: 'log₂ n is how many times you can halve n before reaching 1. For a million it is about 20, so log factors grow very slowly.',

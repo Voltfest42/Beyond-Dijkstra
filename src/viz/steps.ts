@@ -14,7 +14,10 @@ function continues(prev: TraceEvent, next: TraceEvent): boolean {
   return (
     (prev.kind === 'queue' && prev.op === 'pop' && next.kind === 'settle') ||
     (prev.kind === 'relax' && queued) ||
-    (prev.kind === 'source' && queued)
+    (prev.kind === 'source' && queued) ||
+    // The relaxation that exposes a negative cycle, the cycle and the end are one moment.
+    (prev.kind === 'relax' && next.kind === 'negative-cycle') ||
+    (prev.kind === 'negative-cycle' && next.kind === 'done')
   );
 }
 
@@ -51,6 +54,12 @@ export function describeStep(g: Graph, events: readonly TraceEvent[], before: Vi
         break;
       case 'queue':
         if (e.op === 'push' && parts.length === 0) parts.push(`${name(e.v)} joins the queue.`);
+        // A pop without a settle: the hybrid processes a vertex without declaring it final.
+        if (e.op === 'pop' && !events.some((x) => x.kind === 'settle')) {
+          parts.push(
+            `${name(e.v)} comes off the queue (distance ${formatDist(e.key)}), so its non-negative edges are relaxed next. Its distance may still change in a later round.`,
+          );
+        }
         break;
       case 'settle': {
         parts.push(
@@ -61,7 +70,8 @@ export function describeStep(g: Graph, events: readonly TraceEvent[], before: Vi
       case 'relax': {
         const from = name(e.from);
         const to = name(e.to);
-        const sum = `${formatDist(before.dist[e.from])} + ${formatWeight(g.edgeWeight[e.edge])} = ${formatDist(e.candidate)}`;
+        const w = g.edgeWeight[e.edge];
+        const sum = `${formatDist(before.dist[e.from])} ${w < 0 ? '−' : '+'} ${formatWeight(Math.abs(w))} = ${formatDist(e.candidate)}`;
         const current = before.dist[e.to];
         if (e.targetSettled) {
           parts.push(
@@ -82,16 +92,16 @@ export function describeStep(g: Graph, events: readonly TraceEvent[], before: Vi
         }
         break;
       }
-      case 'negative-cycle':
+      case 'negative-cycle': {
+        const loop = e.cycle.map((edge) => name(g.edgeFrom[edge])).concat(name(g.edgeFrom[e.cycle[0]]));
+        const total = e.cycle.reduce((sum, edge) => sum + g.edgeWeight[edge], 0);
         parts.push(
-          `A distance still improved in the extra round, so there is a negative cycle: ${e.cycle
-            .map((edge) => name(g.edgeFrom[edge]))
-            .concat(name(g.edgeFrom[e.cycle[0]]))
-            .join(' → ')}.`,
+          `The loop ${loop.join(' → ')} has total weight ${formatDist(total)}, so going round it again and again makes routes cheaper forever. Shortest distances don't exist.`,
         );
         break;
+      }
       case 'done':
-        if (!events.some((x) => x.kind === 'negative-cycle')) {
+        if (!before.negativeCycle && !events.some((x) => x.kind === 'negative-cycle')) {
           // Settling algorithms (Dijkstra) vs. round-based ones (Bellman–Ford).
           parts.push(
             before.settledOrder.length > 0
@@ -110,5 +120,5 @@ export function describeStep(g: Graph, events: readonly TraceEvent[], before: Vi
   }
 
   if (parts.length === 0) return phase ?? '';
-  return phase && events.some((e) => e.kind === 'round') ? `${phase}. ${parts.join(' ')}` : parts.join(' ');
+  return phase ? `${phase}. ${parts.join(' ')}` : parts.join(' ');
 }

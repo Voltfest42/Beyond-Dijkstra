@@ -131,3 +131,16 @@
   stroke: var(--edge-negative);
   stroke-width: 3;
 }
+
+.kCycle {
+  stroke: var(--edge-negative);
+  stroke-width: 3;
+  stroke-dasharray: 4 3;
+}
+
+.kRoute {
+  stroke: var(--accent);
+  stroke-width: 9;
+  opacity: 0.35;
+  stroke-linecap: round;
+}

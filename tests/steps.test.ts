@@ -2,6 +2,7 @@ import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import { bellmanFord } from '../src/core/algorithms/bellmanFord';
 import { dijkstra } from '../src/core/algorithms/dijkstra';
+import { hybrid } from '../src/core/algorithms/hybrid';
 import { vertexLabel } from '../src/core/graph';
 import { DIJKSTRA_INTRO } from '../src/core/presets';
 import { recordTrace, TracePlayer } from '../src/core/trace';
@@ -54,12 +55,29 @@ describe('step highlights', () => {
   });
 });
 
+describe('negative-cycle captions', () => {
+  it('never claim distances are final once a negative cycle is found', () => {
+    fc.assert(
+      fc.property(graphCase({ minWeight: -6 }), fc.constantFrom(bellmanFord, hybrid), ({ graph, source }, algorithm) => {
+        const { events, result } = recordTrace((emit) => algorithm(graph, source, { emit }));
+        if (result.kind !== 'negative-cycle') return;
+        const stops = computeStops(events);
+        const player = new TracePlayer(graph, events);
+        const last = describeStep(graph, events.slice(stops.at(-2)!, stops.at(-1)), player.stateAt(stops.at(-2)!));
+        expect(last).toContain('total weight');
+        expect(last).not.toContain('final');
+      }),
+      { numRuns: 300 },
+    );
+  });
+});
+
 describe('computeStops', () => {
   it('is strictly increasing, starts at 0, ends at the last event, and gives every step a caption', () => {
     fc.assert(
-      fc.property(graphCase({ minWeight: -4 }), fc.boolean(), ({ graph, source }, useDijkstra) => {
+      fc.property(graphCase({ minWeight: -4 }), fc.constantFrom(dijkstra, bellmanFord, hybrid), ({ graph, source }, algorithm) => {
         const { events } = recordTrace((emit) =>
-          useDijkstra ? dijkstra(graph, source, { emit }) : bellmanFord(graph, source, { emit }),
+          algorithm(graph, source, { emit }),
         );
         const stops = computeStops(events);
         expect(stops[0]).toBe(0);

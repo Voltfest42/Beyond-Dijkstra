@@ -1,0 +1,122 @@
+import { BellmanFordFigure, DijkstraTrapFigure, GoldFarmFigure, HybridFigure } from '../figures/chapter2';
+import { PotentialsFigure } from '../figures/PotentialsFigure';
+import { Callout, DeepDive } from '../site/content/blocks';
+import { Term } from '../site/content/Term';
+
+## Why would an edge be negative?
+
+Most edge weights are costs: kilometres, minutes, euros. But sometimes using an edge *pays you back*, and then its weight is negative:
+
+- **Money.** A route with a toll refund, or a trade that earns more than it costs. In currency exchange, a loop of trades that comes back with more money than it started with is called arbitrage.
+- **Energy.** An electric car *gains* charge going downhill, thanks to regenerative braking.
+- **Games.** A path through a treasure cave earns gold. A healing spring restores stamina.
+- **Hidden inside other problems.** Scheduling rules like "task A must start at least 3 minutes after task B", and many network-flow algorithms, boil down to shortest paths with negative edges.
+
+Negative edges bring a new danger. If a loop of edges adds up to less than zero (a <Term id="negative-cycle">negative cycle</Term>), you can go round it forever and keep getting cheaper:
+
+<GoldFarmFigure
+  number="2.1"
+  tryThis={<p>Press "Do one more lap" a few times. There is no cheapest trip: each extra lap saves one more gold. In a game, this is an infinite-farming exploit.</p>}
+/>
+
+With a negative cycle, "shortest route" simply has no answer. So the real task is: **find the shortest distances when some edges are negative, or prove there is a negative cycle and point to it.**
+
+## Dijkstra breaks
+
+Here is Dijkstra's algorithm, unchanged from Chapter 1, on a small graph with a single <Term id="negative-edge">negative edge</Term>: B → A, with weight −4. When the run finishes, red badges show the distances it got wrong.
+
+<DijkstraTrapFigure
+  number="2.2"
+  tryThis={<p>Watch the step where Dijkstra examines B → A. The edge offers A a distance of 1, better than the 2 that A was settled with. But A is already settled, so Dijkstra ignores it, and C and D, which are reached through A, end up wrong too.</p>}
+/>
+
+This is exactly Habit 1 from Chapter 1 failing: *the future can only add cost* is false when an edge can subtract. Patching it by "un-settling" vertices and processing them again does give correct answers. But on unlucky graphs that patch can take an exponential amount of time, far worse than the algorithm we'll see next.
+
+## Bellman–Ford: correct but slow
+
+The classic safe choice is the Bellman–Ford algorithm (1955–58). It doesn't try to be clever about order. It simply relaxes **every** edge, then does it again, and again:
+
+- After round 1, every vertex whose best route has 1 edge has the right distance. After round 2, every vertex whose best route has up to 2 edges does, and so on.
+- A shortest route never needs more than n − 1 edges, so **n − 1 rounds** are always enough.
+- If one extra round *still* improves something, distances can drop forever: there is a negative cycle.
+
+<BellmanFordFigure
+  number="2.3"
+  tryThis={<p>Run it once as it is: it gets the distances Dijkstra missed. Then lower the weight of C → B to 2 or less, which makes the loop B → A → C → B negative, and run it again. Bellman–Ford finds the cycle.</p>}
+/>
+
+The price is speed. Every round touches all m edges, and there can be n − 1 rounds, so the total work is about **n × m**. On a graph with a million vertices, that is up to a million passes over every edge, where Dijkstra needs one.
+
+<DeepDive title="Why n − 1 rounds always suffice">
+
+Take any vertex v and a shortest route s → x₁ → x₂ → … → v with k edges. Without negative cycles we can assume the route visits no vertex twice, so k ≤ n − 1. Round 1 relaxes the edge s → x₁, so x₁ is correct after round 1. Round 2 relaxes x₁ → x₂ while x₁ is already correct, and so on. After round k, v is correct. With n vertices, k is at most n − 1.
+
+This is also why a change in round n proves a negative cycle: no correct distance can still improve, so some "shortest" route must keep getting shorter, which only a negative loop allows.
+
+For *integer* weights, scaling algorithms (Gabow and Tarjan 1989; Goldberg 1995) improved this to about m√n · log W. For general real-number weights, nobody beat n × m until 2024.
+
+</DeepDive>
+
+## Potentials: changing the weights without changing the answer
+
+Here is the key tool behind the 2022 breakthrough, and it is older than you might think. Give every vertex a number, its **height** (also called a <Term id="potential">potential</Term> or price). Then replace every edge's weight like this:
+
+<Callout title="Reweighting with heights">
+
+**new weight of u → v = old weight + height(u) − height(v)**
+
+</Callout>
+
+Now add up the new weights along any route from S to T. Every vertex in the middle of the route has its height added once (leaving it) and subtracted once (arriving), so those cancel. Only the ends survive:
+
+**new route length = old route length + height(S) − height(T)**
+
+*Every* route from S to T changes by the same amount, so the shortest route stays the shortest. If we can choose heights that make **every edge non-negative**, plain Dijkstra works again. Try it:
+
+<PotentialsFigure
+  number="2.4"
+  tryThis={<p>Make every edge non-negative. Start with the red edge A → B (−2): raise A or lower B until it reaches 0. Watch the table: whatever you do, all five routes move up or down together, and S → A → B → C → T stays the shortest. Stuck? Press "Show a solution".</p>}
+/>
+
+<Callout title="You've seen this trick before: it's A*">
+
+If you've written game pathfinding with <Term id="a-star">A*</Term>, you've used potentials. A* is exactly Dijkstra on edges reweighted by its heuristic h: height = −h(v). A heuristic is called *consistent* when every reweighted edge is non-negative, which is precisely the condition that makes Dijkstra correct.
+
+</Callout>
+
+There's a catch, though. The heights behind "Show a solution" come from Johnson's 1977 recipe: take the shortest distances from an extra vertex connected to everything by 0-weight edges. Those distances always make every edge non-negative. But computing them *is* a negative-weight shortest-path problem, the very thing we were trying to solve. Potentials turn the question into **how to find good heights cheaply**.
+
+## A faster engine: Dijkstra plus Bellman–Ford
+
+One more ingredient. What if we run Dijkstra but *ignore* the negative edges, then do a single Bellman–Ford pass over just the negative edges, and repeat?
+
+1. **Dijkstra pass:** take queued vertices smallest-first and relax their non-negative edges, like Chapter 1.
+2. **Bellman–Ford pass:** relax the negative edges out of every vertex the Dijkstra pass just handled.
+3. Any vertex that improved goes back into the queue for the next round. Stop when nothing improves.
+
+Each round fixes every vertex whose best route uses one more negative edge. So if every shortest route uses at most <Term id="eta">η</Term> negative edges, this hybrid finishes within **η + 1 rounds**, and each round is only about as expensive as Dijkstra.
+
+<HybridFigure
+  number="2.5"
+  tryThis={<p>Run the first example to the end: two rounds. Then switch to the staircase, where the route to F uses five negative edges in a row, and use "Skip to the next round" to see one more vertex of the staircase get corrected each round.</p>}
+/>
+
+<Callout title="The key idea of this chapter">
+
+The hybrid is fast when **η is small**, meaning when shortest routes pass through only a few negative edges. Potentials can change which edges are negative without changing any answer. So the question becomes: can we find heights that leave shortest routes with *few* negative edges, without first solving the whole problem? In 2022, the answer turned out to be yes.
+
+</Callout>
+
+<DeepDive title="How fast is the hybrid, exactly?">
+
+Each round is one Dijkstra pass (about m + n log n work) plus one pass over the negative edges, so the total is roughly (η + 1) × (m + n log n). A sharper count, used in the 2022 paper (where the hybrid is called *ElimNeg*), charges each vertex only for the rounds it actually changes in. That gives about log n × (n + the sum of η(v) over all vertices v).
+
+If a negative cycle exists, the rounds would never stop. But without one, η is at most n − 1, so this demo declares a negative cycle as soon as round n + 1 would begin.
+
+</DeepDive>
+
+<Callout kind="ahead">
+
+Next: how Bernstein, Nanongkai and Wulff-Nilsen found such heights in near-linear time in 2022, using random clusters, recursion and the hybrid you just saw. This part of the chapter is still being written.
+
+</Callout>

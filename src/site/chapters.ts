@@ -32,7 +32,14 @@ export const CHAPTERS: readonly ChapterInfo[] = [
     number: 2,
     title: 'Wall 1: negative edges',
     blurb: 'Why Dijkstra breaks on negative edges, and the 2022 near-linear-time fix.',
-    sections: [],
+    sections: [
+      'Why would an edge be negative?',
+      'Dijkstra breaks',
+      'Bellman–Ford: correct but slow',
+      'Potentials: changing the weights without changing the answer',
+      'A faster engine: Dijkstra plus Bellman–Ford',
+    ],
+    load: () => import('../content/chapter2.mdx'),
   },
   {
     slug: 'sorting-barrier',

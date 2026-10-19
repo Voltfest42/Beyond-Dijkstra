@@ -38,17 +38,29 @@ export function Caption({ children }: { children: ReactNode }) {
   );
 }
 
-export type LegendItem = 'unvisited' | 'frontier' | 'settled' | 'current' | 'tree' | 'improved' | 'checked' | 'negative';
+export type LegendItem =
+  | 'unvisited'
+  | 'frontier'
+  | 'settled'
+  | 'current'
+  | 'tree'
+  | 'improved'
+  | 'checked'
+  | 'negative'
+  | 'cycle'
+  | 'route';
 
 const LEGEND: Record<LegendItem, { label: string; symbol: ReactNode }> = {
   unvisited: { label: 'not reached', symbol: <circle r="7" className={styles.kUnvisited} /> },
-  frontier: { label: 'tentative (in queue)', symbol: <circle r="7" className={styles.kFrontier} /> },
+  frontier: { label: 'tentative (not final)', symbol: <circle r="7" className={styles.kFrontier} /> },
   settled: { label: 'settled (final)', symbol: <circle r="7" className={styles.kSettled} /> },
   current: { label: 'being processed', symbol: <circle r="7" className={styles.kCurrent} /> },
   tree: { label: 'best route so far', symbol: <line x1="-9" x2="9" className={styles.kTree} /> },
   improved: { label: 'edge improved a distance', symbol: <line x1="-9" x2="9" className={styles.kImproved} /> },
   checked: { label: 'edge checked, no change', symbol: <line x1="-9" x2="9" className={styles.kChecked} /> },
   negative: { label: 'negative edge', symbol: <line x1="-9" x2="9" className={styles.kNegative} /> },
+  cycle: { label: 'negative cycle', symbol: <line x1="-9" x2="9" className={styles.kCycle} /> },
+  route: { label: 'highlighted route', symbol: <line x1="-9" x2="9" className={styles.kRoute} /> },
 };
 
 export function Legend({ items }: { items: readonly LegendItem[] }) {

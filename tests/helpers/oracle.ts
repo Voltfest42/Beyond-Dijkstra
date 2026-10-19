@@ -1,6 +1,31 @@
 import type { EdgeSpec } from '../../src/core/graph';
 
 /**
+ * η: the largest, over reachable vertices v, of the fewest negative edges on
+ * any shortest s → v path. Computed by Bellman–Ford on (distance, negative
+ * edges) pairs compared lexicographically. Only meaningful without a
+ * reachable negative cycle.
+ */
+export function maxNegativeEdgesOnShortestPaths(n: number, edges: readonly EdgeSpec[], source: number): number {
+  const dist = new Array<number>(n).fill(Infinity);
+  const neg = new Array<number>(n).fill(Infinity);
+  dist[source] = 0;
+  neg[source] = 0;
+  for (let round = 0; round < n; round++) {
+    for (const { from, to, weight } of edges) {
+      if (dist[from] === Infinity) continue;
+      const d = dist[from] + weight;
+      const k = neg[from] + (weight < 0 ? 1 : 0);
+      if (d < dist[to] || (d === dist[to] && k < neg[to])) {
+        dist[to] = d;
+        neg[to] = k;
+      }
+    }
+  }
+  return Math.max(0, ...neg.filter(Number.isFinite));
+}
+
+/**
  * Ground truth via Floyd–Warshall: a completely independent algorithm, so a
  * shared bug between Dijkstra and Bellman–Ford can't hide.
  */

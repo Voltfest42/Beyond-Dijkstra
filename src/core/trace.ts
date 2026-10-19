@@ -66,6 +66,8 @@ export interface VisualState {
   line: string | null;
   phase: string | null;
   round: number | null;
+  /** Relaxations performed so far (edges examined with a finite start distance). */
+  relaxations: number;
   negativeCycle: EdgeId[] | null;
   done: boolean;
 }
@@ -85,6 +87,7 @@ export function initialState(n: number): VisualState {
     line: null,
     phase: null,
     round: null,
+    relaxations: 0,
     negativeCycle: null,
     done: false,
   };
@@ -121,6 +124,7 @@ export function applyEvent(s: VisualState, event: TraceEvent): void {
       if (s.status[event.v] === 'unvisited') s.status[event.v] = 'frontier';
       break;
     case 'relax':
+      s.relaxations++;
       s.current = event.from;
       s.activeEdge = event.edge;
       s.activeEdgeImproved = event.improved;
@@ -162,6 +166,10 @@ export function applyEvent(s: VisualState, event: TraceEvent): void {
       s.done = true;
       s.current = null;
       s.line = null;
+      // Algorithms that never "settle" one by one (Bellman–Ford, the hybrid) are final now.
+      if (!s.negativeCycle) {
+        for (let v = 0; v < s.status.length; v++) if (s.status[v] === 'frontier') s.status[v] = 'settled';
+      }
       break;
   }
 }
