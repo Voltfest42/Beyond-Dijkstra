@@ -1,0 +1,67 @@
+import { TimelineFigure } from '../figures/TimelineFigure';
+import { Callout } from '../site/content/blocks';
+import { Term } from '../site/content/Term';
+
+## The whole story on one page
+
+In 1956, Dijkstra's algorithm came with two built-in habits. Between 2022 and 2025, both stopped being limits:
+
+| | Habit 1: "once settled, never changes" | Habit 2: "vertices come out in sorted order" |
+|---|---|---|
+| **The wall** | Wrong answers with <Term id="negative-edge">negative edges</Term>. The safe fallback, Bellman–Ford, takes n × m steps. | Never faster than sorting: about m + n log n. |
+| **The key insight** | Heights (potentials) can make every edge non-negative without changing any shortest route. Random clusters make them cheap to find. | Most of the sorting isn't needed. A little Bellman–Ford finishes most vertices, and only "pivots" need ordering. |
+| **The breakthrough** | Bernstein, Nanongkai and Wulff-Nilsen, 2022: near-linear time | Duan, Mao, Mao, Shu and Yin, 2025: O(m log^(2/3) n) |
+| **In practice** | Promising: an engineered version beats the classic method by up to almost 100× on hard inputs. | Not yet: Dijkstra is still 3–4× faster in the best published implementation. |
+| **Since then** | Real-valued weights: Bellman–Ford finally beaten (2024), and an almost-linear preprint (2026) | Down to O(m √(log n · log log n)) (2026) |
+
+Here is every result from this story in one place:
+
+<TimelineFigure
+  number="4.1"
+  title="Shortest paths, 1955–2026"
+  tracks={['classic', 'integer', 'real', 'sorting']}
+  tryThis={<p>The four buttons above the list each show one line of work. Notice the long quiet stretch from the 1990s to 2022, followed by a burst of results. Click any entry for details and a link to the paper.</p>}
+/>
+
+## Theory versus practice
+
+It's tempting to judge an algorithm only by whether it is faster today. These results show why that misses the point.
+
+- **The negative-weight line is heading into practice.** Its building blocks (clustering, potentials and the Dijkstra/Bellman–Ford hybrid) are simple enough to engineer. Within three years of the 2022 paper, a tuned implementation was beating the classic method on the hardest test graphs.
+- **The sorting-barrier line is pure theory, for now.** Its gain is a few log factors, and on any graph that fits in a computer, its extra machinery costs more than it saves. But it overturned a belief that had lasted for decades, and it gave researchers new tools that are already being refined.
+
+Both results also share a lesson: they were built from **old, simple pieces**, namely Dijkstra, Bellman–Ford, potentials and recursion, combined in new ways. Neither needed exotic mathematics.
+
+## What this means for games and maps
+
+If you write pathfinding code, here is the honest summary:
+
+- **Dijkstra and A\* are still the right tools.** Game maps are small to medium-sized, and a binary heap is fast and simple. Nothing in this story changes that.
+- **You already use potentials.** <Term id="a-star">A*</Term> is Dijkstra on edges reweighted by its heuristic, the same trick behind the 2022 algorithm. A heuristic is *consistent* exactly when every reweighted edge is non-negative.
+- **Negative costs need care.** If your game has rewards along paths (healing springs, loot, boost pads), plain Dijkstra and A\* can return wrong routes, and a reward loop is an exploit (Chapter 2). Model rewards as non-negative costs where you can, or use the Bellman–Ford family, which detects negative cycles.
+- **Map apps don't run Dijkstra from scratch.** Road-network routing preprocesses the map (for example with *contraction hierarchies*) so that queries take microseconds. Raw single-source speed isn't their bottleneck.
+
+## Open questions
+
+Plenty is still unknown:
+
+- **Is linear time possible?** For undirected graphs with integer weights, Thorup reached O(m) back in 1999. For directed graphs with real weights, nobody knows whether O(m) is achievable, or what the true limit is.
+- **Can the sorting-barrier algorithms become practical?** Simpler versions with smaller constant factors would be needed, and that is an active area of research.
+- **Will the 2026 almost-linear result for negative real weights hold up?** It is a preprint and still needs peer review. If it holds, both versions of the negative-weight problem are essentially solved.
+- **How simple can these algorithms get?** History suggests the first breakthrough is rarely the final form. The 2023 "Now Faster!" paper and the 2025 simpler proof of Dijkstra's universal optimality are early examples.
+
+## Further reading
+
+Written for a general audience:
+
+- Quanta Magazine, January 2023: [Finally, a Fast Algorithm for Shortest Paths on Negative Graphs](https://www.quantamagazine.org/finally-a-fast-algorithm-for-shortest-paths-on-negative-graphs-20230118/)
+- Quanta Magazine, October 2024: [Computer Scientists Establish the Best Way to Traverse a Graph](https://www.quantamagazine.org/computer-scientists-establish-the-best-way-to-traverse-a-graph-20241025/)
+- Quanta Magazine, August 2025: [New Method Is the Fastest Way To Find the Best Routes](https://www.quantamagazine.org/new-method-is-the-fastest-way-to-find-the-best-routes-20250806/)
+
+The main papers:
+
+- Bernstein, Nanongkai and Wulff-Nilsen: [Negative-Weight Single-Source Shortest Paths in Near-linear Time](https://arxiv.org/abs/2203.03456) (FOCS 2022)
+- Haeupler, Hladík, Rozhoň, Tarjan and Tětek: [Universal Optimality of Dijkstra via Beyond-Worst-Case Heaps](https://arxiv.org/abs/2311.11793) (FOCS 2024)
+- Duan, Mao, Mao, Shu and Yin: [Breaking the Sorting Barrier for Directed Single-Source Shortest Paths](https://arxiv.org/abs/2504.17033) (STOC 2025)
+
+Every other source is listed on the [About page](#/about). To try any algorithm on your own graph, open the [Playground](#/playground).

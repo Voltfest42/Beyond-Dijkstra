@@ -1,14 +1,15 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { findChapter } from './site/chapters';
 import { ErrorBoundary } from './site/ErrorBoundary';
 import { Layout } from './site/Layout';
 import { About } from './site/pages/About';
 import { ChapterPage } from './site/pages/ChapterPage';
-import { ComingSoon, NotFound } from './site/pages/ComingSoon';
+import { NotFound } from './site/pages/ComingSoon';
 import { Landing } from './site/pages/Landing';
 import { useRoute } from './site/router';
 
 const SITE = 'Beyond Dijkstra';
+const Playground = lazy(() => import('./playground/Playground').then((m) => ({ default: m.Playground })));
 
 export function App() {
   const { page, section } = useRoute();
@@ -26,7 +27,11 @@ export function App() {
     content = <About />;
     title = `About · ${SITE}`;
   } else if (page === 'playground') {
-    content = <ComingSoon title="Playground" blurb="Draw any graph and run any algorithm on it, step by step." />;
+    content = (
+      <Suspense fallback={<p style={{ padding: 32 }}>Loading the playground…</p>}>
+        <Playground />
+      </Suspense>
+    );
     title = `Playground · ${SITE}`;
   } else {
     content = <NotFound />;

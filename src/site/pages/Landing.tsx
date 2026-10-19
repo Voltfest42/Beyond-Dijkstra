@@ -64,6 +64,10 @@ export function Landing() {
           backwards with the buttons or the <kbd>←</kbd> <kbd>→</kbd> keys. A caption under each figure says what just
           happened and why. Dotted-underlined words have a short definition: hover over or tap them.
         </p>
+        <p>
+          Want to experiment? The <a href={href('playground')}>Playground</a> lets you draw your own graph and run any of
+          the algorithms on it.
+        </p>
         <p>The colours mean the same thing in every figure:</p>
         <Legend items={['unvisited', 'frontier', 'settled', 'current', 'tree', 'improved', 'checked', 'negative']} />
       </div>

@@ -54,6 +54,8 @@ export const CHAPTERS: readonly ChapterInfo[] = [
       'Where the time goes: the frontier',
       'Idea 1: shrink the frontier with a little Bellman–Ford',
       'Idea 2: divide and conquer by distance',
+      'The race: theory versus practice',
+      'Epilogue: 2026',
     ],
     load: () => import('../content/chapter3.mdx'),
   },
@@ -62,7 +64,14 @@ export const CHAPTERS: readonly ChapterInfo[] = [
     number: 4,
     title: 'What it all means',
     blurb: 'Theory versus practice, the full timeline, and where the field went next.',
-    sections: [],
+    sections: [
+      'The whole story on one page',
+      'Theory versus practice',
+      'What this means for games and maps',
+      'Open questions',
+      'Further reading',
+    ],
+    load: () => import('../content/chapter4.mdx'),
   },
 ];
 

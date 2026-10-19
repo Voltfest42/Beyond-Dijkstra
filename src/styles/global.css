@@ -117,3 +117,16 @@ kbd {
   --cluster-4: #db2777;
   --cluster-5: #65a30d;
 }
+
+/* Chart series (validated for colour-blind separation and contrast in both themes). */
+:root {
+  --series-1: #2563eb;
+  --series-2: #d97706;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --series-1: #4f84f5;
+    --series-2: #d97706;
+  }
+}

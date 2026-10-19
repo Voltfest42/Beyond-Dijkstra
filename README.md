@@ -26,7 +26,10 @@ src/core/      algorithms and data structures (pure TypeScript, no UI)
 src/viz/       reusable visual pieces: graph view, step player, panels, distance line
 src/figures/   the interactive figures used in the chapters
 src/site/      site shell: routing, sidebar, pages, glossary, reading progress
-src/content/   chapter text (MDX)
+src/content/   chapter text (MDX) and the results timeline
+src/bench/     the Dijkstra vs. 2025-algorithm race (runs in a Web Worker) and its reference results
+src/playground/ the graph editor and algorithm runner
+scripts/       record-race.ts: re-records src/bench/reference.json (npx tsx scripts/record-race.ts)
 tests/         unit and property tests (every algorithm vs. an independent reference)
 infra/         AWS CDK app: private S3 bucket + CloudFront
 docs/          research notes and plan

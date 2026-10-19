@@ -1,0 +1,210 @@
+.page {
+  max-width: 1080px;
+}
+
+.select {
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.message {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--highlight-bg);
+  font-size: 0.92rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin: 8px 0 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tabs button {
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 8px 14px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.tabs button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.tabs .activeTab {
+  color: var(--text);
+  font-weight: 650;
+  border-bottom-color: var(--accent);
+}
+
+.editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 820px) {
+  .editor {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-family: var(--font-sans);
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+.edge {
+  cursor: pointer;
+  --edge-color: var(--edge-default);
+}
+
+.edge.negative {
+  --edge-color: var(--edge-negative);
+}
+
+.selectedEdge {
+  --edge-color: var(--accent);
+}
+
+.hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
+}
+
+.edgeLine {
+  fill: none;
+  stroke: var(--edge-color);
+  stroke-width: 2.5;
+}
+
+.selectedEdge .edgeLine {
+  stroke-width: 4.5;
+}
+
+.arrow {
+  fill: var(--edge-color);
+}
+
+.weightBg {
+  fill: var(--surface);
+  stroke: var(--edge-color);
+}
+
+.weight {
+  font-size: 15px;
+  font-weight: 600;
+  text-anchor: middle;
+  fill: var(--text);
+}
+
+.negative .weight {
+  fill: var(--edge-negative);
+}
+
+.vertex {
+  cursor: grab;
+}
+
+.vertex circle {
+  fill: var(--surface);
+  stroke: var(--state-settled);
+  stroke-width: 3;
+}
+
+.vertex text {
+  font-size: 17px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: var(--text);
+  pointer-events: none;
+}
+
+.selectedVertex circle {
+  fill: var(--state-settled);
+}
+
+.selectedVertex text {
+  fill: var(--on-settled);
+}
+
+.target circle {
+  stroke: var(--state-frontier);
+  stroke-width: 5;
+}
+
+.vertex .startTag {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  fill: var(--text-muted);
+}
+
+.emptyHint {
+  font-size: 16px;
+  text-anchor: middle;
+  fill: var(--text-muted);
+  pointer-events: none;
+}
+
+.inspector {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.inspector h4 {
+  margin: 0 0 10px;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.howTo {
+  margin: 0;
+  padding-left: 1.2em;
+  font-size: 0.88rem;
+}
+
+.buttonRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.weightLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+}
+
+.weightLabel input {
+  width: 100%;
+}

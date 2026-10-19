@@ -1,5 +1,7 @@
 import { BmsspFigure, FindPivotsFigure } from '../figures/BmsspFigures';
 import { FrontierFigure, SortingFigure } from '../figures/chapter3';
+import { RaceFigure } from '../figures/RaceFigure';
+import { TimelineFigure } from '../figures/TimelineFigure';
 import { Callout, DeepDive } from '../site/content/blocks';
 import { Term } from '../site/content/Term';
 
@@ -109,8 +111,44 @@ Every implementation detail here is checked by automated tests. The algorithm is
 
 </DeepDive>
 
+## The race: theory versus practice
+
+The new algorithm beats Dijkstra *in theory*: as graphs grow, its running time grows more slowly. But "in theory" hides constant factors, the fixed amount of work per step, which O-notation ignores. Time to race them. The figure below runs both algorithms on random graphs of growing size, in a background thread of your own browser:
+
+<RaceFigure
+  number="3.5"
+  tryThis={<p>Press "Run the race in your browser" (it takes a second or two), then compare your line with the reference run. Then look at the last column of the table: counted in comparisons instead of milliseconds, the two are much closer. Choose "up to 300K vertices" to push it further.</p>}
+/>
+
+Three things are true at once:
+
+- **The theory shows up.** The gap narrows as graphs grow: in the reference run, from about 12× slower at a thousand vertices to about 6× slower at three hundred thousand. That is the growth-rate advantage at work.
+- **In the theory's own currency, it's close.** Count *comparisons* between distances (what the O-notation measures), and the new algorithm goes from about 2.1× Dijkstra's count to about 1.3×.
+- **Dijkstra still wins on the clock, by a lot.** Most of the slowdown is bookkeeping that comparisons don't count: recursive calls, Bellman–Ford rounds that relax some edges several times, and managing the partly sorted blocks. Dijkstra's simple binary heap is very hard to beat.
+
+This isn't just this site's implementation. In 2025, Lucas Castro, Thailsson Clementino and Rosiane de Freitas tested a careful C++ implementation on random graphs, grids and US road networks with up to 10 million vertices. **Dijkstra was 3–4× faster in every test.** They estimated that the paper's worst-case version would only overtake Dijkstra on graphs with vastly more than 10^67 vertices, far more than there are atoms on Earth.
+
+The room for improvement is also small. For a million vertices, Dijkstra's sorting costs about log₂ n ≈ 20 per vertex, while the new bound has log^(2/3) n ≈ 7.4. The best possible saving is less than 3×, and the extra machinery costs more than that.
+
+<Callout title="So was it worth it?">
+
+Yes. The result doesn't speed up today's software, but it settles a question: **Dijkstra's sorting barrier is not a law of nature.** For decades, many researchers assumed nothing could beat "m + n log n" for this problem. Now we know better, and the ideas (shrinking the frontier with a little Bellman–Ford, and sorting only what's needed) are new tools for everyone.
+
+</Callout>
+
+## Epilogue: 2026
+
+The story didn't stop in 2025. In February 2026, Ran Duan, Xiao Mao, Xinkai Shu and Longhui Yin improved their own bound to **O(m √(log n · log log n))** for sparse directed graphs (published at ICALP 2026). In September 2026, a preprint by Avi Kadria and Liam Roditty squeezed a little more out of the undirected case. The record for sparse directed graphs with real weights now sits at about √(log n · log log n) per edge, after more than forty years at log n.
+
+<TimelineFigure
+  number="3.6"
+  title="Beating the sorting barrier: the results"
+  tracks={['sorting']}
+  tryThis={<p>Open the 2024 entry and the 2025 one. Together they make the chapter's point: Dijkstra is the best possible if you need the vertices in order, and beatable if you don't.</p>}
+/>
+
 <Callout kind="ahead">
 
-So the new algorithm beats Dijkstra in theory. Does it win in practice? The next part of this chapter races the two in your browser, and covers what happened in 2026. It is still being written.
+That completes both walls. The final chapter steps back: what do these results mean for the software people actually write, and what is still open? That's [Chapter 4](#/what-it-means).
 
 </Callout>

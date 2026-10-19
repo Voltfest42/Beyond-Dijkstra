@@ -91,7 +91,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <ul className={styles.extraList}>
           <li>
             <a href={href('playground')} className={route.page === 'playground' ? styles.active : undefined}>
-              Playground <span className={styles.soon}>soon</span>
+              Playground
             </a>
           </li>
           <li>

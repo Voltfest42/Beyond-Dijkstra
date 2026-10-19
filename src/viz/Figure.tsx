@@ -13,9 +13,9 @@ interface FigureProps {
 /** The frame around every interactive figure: numbered title, the demo, and a "Try this" prompt. */
 export function Figure({ number, title, children, tryThis, onKeyDown }: FigureProps) {
   return (
-    <figure className={styles.figure} onKeyDown={onKeyDown} aria-labelledby={`figure-${number}`}>
-      <figcaption className={styles.header} id={`figure-${number}`}>
-        <span className={styles.number}>Figure {number}</span>
+    <figure className={styles.figure} onKeyDown={onKeyDown} aria-labelledby={`figure-${number || 'unnumbered'}`}>
+      <figcaption className={styles.header} id={`figure-${number || 'unnumbered'}`}>
+        {number && <span className={styles.number}>Figure {number}</span>}
         <span className={styles.title}>{title}</span>
       </figcaption>
       {children}

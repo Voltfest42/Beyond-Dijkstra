@@ -167,5 +167,7 @@ export function describeStep(g: Graph, events: readonly TraceEvent[], before: Vi
   }
 
   if (parts.length === 0) return phase ?? '';
-  return phase ? `${phase}. ${parts.join(' ')}` : parts.join(' ');
+  // The final "Done: …" already says everything; a phase label in front would repeat it.
+  const finishing = events.some((x) => x.kind === 'done') && !events.some((x) => x.kind === 'negative-cycle');
+  return phase && !finishing ? `${phase}. ${parts.join(' ')}` : parts.join(' ');
 }

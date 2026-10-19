@@ -238,6 +238,17 @@ export const TIMELINE: readonly TimelineEntry[] = [
   {
     year: '2026',
     track: 'sorting',
+    title: 'Undirected graphs, a little faster',
+    who: 'Kadria and Roditty',
+    venue: 'Preprint, September 2026',
+    bound: 'O(m √(log n) (log log n)^(1/4) (log log log n)^(1/4))',
+    detail: 'The first improvement for undirected graphs since 2023. Not yet peer-reviewed.',
+    preprint: true,
+    link: 'https://arxiv.org/abs/2609.15247',
+  },
+  {
+    year: '2026',
+    track: 'sorting',
     title: 'Faster still',
     who: 'Duan, Mao, Shu and Yin',
     venue: 'ICALP 2026',
@@ -246,3 +257,25 @@ export const TIMELINE: readonly TimelineEntry[] = [
     link: 'https://arxiv.org/abs/2602.07868',
   },
 ];
+
+/** The exact paper titles behind the timeline's links, for citation lists. */
+export const PAPER_TITLES: Record<string, string> = {
+  'https://arxiv.org/abs/2203.03456': 'Negative-Weight Single-Source Shortest Paths in Near-linear Time',
+  'https://arxiv.org/abs/2203.00671': 'Maximum Flow and Minimum-Cost Flow in Almost-Linear Time',
+  'https://arxiv.org/abs/2304.05279': 'Negative-Weight Single-Source Shortest Paths in Near-Linear Time: Now Faster!',
+  'https://arxiv.org/abs/2311.02520': 'Single-Source Shortest Paths with Negative Real Weights in Õ(mn^(8/9)) Time',
+  'https://arxiv.org/abs/2407.04872': 'Faster single-source shortest paths with negative real weights via proper hop distance',
+  'https://arxiv.org/abs/2502.11999': 'Algorithm Engineering of SSSP With Negative Edge Weights',
+  'https://arxiv.org/abs/2511.12714': 'Shortcutting for Negative-Weight Shortest Paths',
+  'https://arxiv.org/abs/2510.22721': 'Faster Negative-Weight Shortest Paths and Directed Low-Diameter Decompositions',
+  'https://arxiv.org/abs/2506.00428': 'Faster negative length shortest paths by bootstrapping hop reducers',
+  'https://arxiv.org/abs/2602.16638': 'An n^(2+o(1)) Time Algorithm for Single-Source Negative Weight Shortest Paths',
+  'https://arxiv.org/abs/2607.19346': 'Bellman-Ford in Almost-Linear Time',
+  'https://arxiv.org/abs/2307.04139': 'A Randomized Algorithm for Single-Source Shortest Path on Undirected Real-Weighted Graphs',
+  'https://arxiv.org/abs/2311.11793': 'Universal Optimality of Dijkstra via Beyond-Worst-Case Heaps',
+  'https://arxiv.org/abs/2504.17033': 'Breaking the Sorting Barrier for Directed Single-Source Shortest Paths',
+  'https://arxiv.org/abs/2511.03007':
+    'Implementation and Brief Experimental Analysis of the Duan et al. (2025) Algorithm for Single-Source Shortest Paths',
+  'https://arxiv.org/abs/2602.07868': 'A Faster Directed Single-Source Shortest Path Algorithm',
+  'https://arxiv.org/abs/2609.15247': 'A Faster Undirected Single-Source Shortest Path Algorithm',
+};
