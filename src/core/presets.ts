@@ -121,6 +121,54 @@ export const NEGATIVE_STAIRCASE = buildPreset({
 });
 
 /**
+ * The 2022 walkthrough: four natural groups of three (each a small positive
+ * loop containing one negative edge), joined by longer edges, three of them
+ * negative. Seven negative edges, no negative cycle.
+ */
+export const BNW_DEMO = buildPreset({
+  vertices: [
+    { label: 'S', x: 50, y: 215 },
+    { label: 'a', x: 185, y: 95 },
+    { label: 'b', x: 300, y: 55 },
+    { label: 'c', x: 290, y: 165 },
+    { label: 'd', x: 185, y: 335 },
+    { label: 'e', x: 300, y: 375 },
+    { label: 'f', x: 290, y: 265 },
+    { label: 'g', x: 470, y: 55 },
+    { label: 'h', x: 600, y: 85 },
+    { label: 'i', x: 480, y: 165 },
+    { label: 'j', x: 470, y: 375 },
+    { label: 'k', x: 600, y: 345 },
+    { label: 'l', x: 480, y: 265 },
+    { label: 'Z', x: 730, y: 215 },
+  ],
+  edges: [
+    ['S', 'a', 4],
+    ['S', 'd', 3],
+    ['a', 'b', 2],
+    ['b', 'c', -1],
+    ['c', 'a', 3],
+    ['d', 'e', 2],
+    ['e', 'f', -2],
+    ['f', 'd', 3],
+    ['c', 'f', 1],
+    ['b', 'g', 5],
+    ['c', 'i', -3],
+    ['e', 'j', 6],
+    ['f', 'l', -2],
+    ['g', 'h', -1],
+    ['h', 'i', 2],
+    ['i', 'g', 2],
+    ['j', 'k', 2],
+    ['k', 'l', -1],
+    ['l', 'j', 2],
+    ['i', 'l', 4],
+    ['h', 'Z', 3],
+    ['k', 'Z', -2],
+  ],
+});
+
+/**
  * Chapter 1's map. Starting from S it shows every behaviour worth seeing:
  * decrease-keys (A: 4 → 3, E: 12 → 11), a "not shorter" relaxation (C → D),
  * an edge into an already-settled vertex (D → A), and a tie (E and F at 11).

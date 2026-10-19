@@ -107,3 +107,13 @@ kbd {
   border-radius: 5px;
   background: var(--surface);
 }
+
+/* Cluster colours (decomposition figures), distinguishable in both themes. */
+:root {
+  --cluster-0: #2563eb;
+  --cluster-1: #d97706;
+  --cluster-2: #0d9488;
+  --cluster-3: #9333ea;
+  --cluster-4: #db2777;
+  --cluster-5: #65a30d;
+}

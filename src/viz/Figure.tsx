@@ -48,7 +48,9 @@ export type LegendItem =
   | 'checked'
   | 'negative'
   | 'cycle'
-  | 'route';
+  | 'route'
+  | 'cluster'
+  | 'cut';
 
 const LEGEND: Record<LegendItem, { label: string; symbol: ReactNode }> = {
   unvisited: { label: 'not reached', symbol: <circle r="7" className={styles.kUnvisited} /> },
@@ -61,6 +63,8 @@ const LEGEND: Record<LegendItem, { label: string; symbol: ReactNode }> = {
   negative: { label: 'negative edge', symbol: <line x1="-9" x2="9" className={styles.kNegative} /> },
   cycle: { label: 'negative cycle', symbol: <line x1="-9" x2="9" className={styles.kCycle} /> },
   route: { label: 'highlighted route', symbol: <line x1="-9" x2="9" className={styles.kRoute} /> },
+  cluster: { label: 'cluster', symbol: <circle r="9" className={styles.kCluster} /> },
+  cut: { label: 'cut edge', symbol: <line x1="-9" x2="9" className={styles.kCut} /> },
 };
 
 export function Legend({ items }: { items: readonly LegendItem[] }) {

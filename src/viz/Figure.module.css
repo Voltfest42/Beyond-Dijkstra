@@ -144,3 +144,14 @@
   opacity: 0.35;
   stroke-linecap: round;
 }
+
+.kCluster {
+  fill: var(--cluster-0);
+  opacity: 0.3;
+}
+
+.kCut {
+  stroke: var(--text-muted);
+  stroke-width: 2.5;
+  stroke-dasharray: 4 3;
+}

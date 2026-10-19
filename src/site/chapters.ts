@@ -38,6 +38,8 @@ export const CHAPTERS: readonly ChapterInfo[] = [
       'Bellman–Ford: correct but slow',
       'Potentials: changing the weights without changing the answer',
       'A faster engine: Dijkstra plus Bellman–Ford',
+      'The 2022 breakthrough: make η small',
+      'What happened next',
     ],
     load: () => import('../content/chapter2.mdx'),
   },

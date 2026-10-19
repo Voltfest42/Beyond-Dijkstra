@@ -1,4 +1,6 @@
+import { BnwFigure } from '../figures/BnwFigure';
 import { BellmanFordFigure, DijkstraTrapFigure, GoldFarmFigure, HybridFigure } from '../figures/chapter2';
+import { TimelineFigure } from '../figures/TimelineFigure';
 import { PotentialsFigure } from '../figures/PotentialsFigure';
 import { Callout, DeepDive } from '../site/content/blocks';
 import { Term } from '../site/content/Term';
@@ -115,8 +117,61 @@ If a negative cycle exists, the rounds would never stop. But without one, η is 
 
 </DeepDive>
 
+## The 2022 breakthrough: make η small
+
+In 2022, Aaron Bernstein, Danupon Nanongkai and Christian Wulff-Nilsen showed how to find good heights almost as fast as running Dijkstra once. Their paper won the best paper award at FOCS, one of the two top conferences in theoretical computer science. What surprised people was that it needs no heavy machinery, just the tools from this chapter combined in a clever way. One pass of their method has four phases:
+
+1. **Cluster.** Pretend for a moment that negative edges cost 0, and carve the graph into *clusters*: groups of vertices that are all close to each other. The carving uses balls of *random* size around random vertices. That randomness is what keeps cuts rare: a short edge is unlikely to sit exactly where a random ball happens to end.
+2. **Fix the inside of each cluster**, by running the same method on each cluster alone. This is recursion, and it works because a tight cluster can't hide many negative edges on one route (see the deep dive below).
+3. **Fix the edges between clusters.** The uncut edges between clusters never loop back, so the clusters can be put in order. Then one sweep lowers each cluster's heights just enough to make every forward edge non-negative.
+4. **Clean up.** Only the few *cut* edges can still be negative, so shortest routes contain few of them, and the hybrid from Section 2.5 finishes in a few rounds.
+
+<BnwFigure
+  number="2.6"
+  tryThis={<p>Step through the six stages and watch the "Negative edges" and "η" counters fall. Then press "Re-roll the random clusters" a few times: the clusters, and how much work the clean-up has left, change every time, but the final distances are always the same.</p>}
+/>
+
+**Scaling** ties it together. The clustering argument only works when negative edges are *slightly* negative. So the real algorithm multiplies every weight by 2n and runs the pass in rounds:
+
+- The first round makes every edge at least −B/2, the next at least −B/4, and so on, for about log(nW) rounds.
+- Each round is one call of the method above (called *ScaleDown* in the paper), and each call halves how negative any edge may be.
+- Once every edge is at least −1, adding 1 to every edge makes them all non-negative. Because of the factor 2n, adding 1 per edge can't change which route is shortest. One run of Dijkstra finishes the job.
+
+The result runs in **O(m log⁸ n · log W)** time, where W is the size of the most negative weight. That is near-linear: m times a handful of log factors, which come from the scaling rounds, the recursion depth, the random cutting and Dijkstra's priority queue. The algorithm is randomized, but it never gives a wrong answer: the randomness only affects how long it takes. It also detects negative cycles: if one exists, some round's clean-up keeps improving forever, and the algorithm stops and reports it.
+
+<DeepDive title="Why a tight cluster can't hide many negative edges">
+
+Take one ScaleDown round, where every edge is at least −2B. The method first adds B to each negative edge, so they become at least −B, and it treats them as 0 while clustering. Every cluster is then "tight": any vertex in it can reach any other within distance about D = (Δ/2) · B, where Δ is the current limit on how many negative edges a shortest route may need.
+
+Now suppose a shortest route *inside* a cluster used more than Δ/2 negative edges. Each subtracts close to B, so its total would drop below about −(Δ/2) · B. But tightness means you can walk from the route's end back to its start for at most about (Δ/2) · B. Together that is a loop with negative total weight, a negative cycle. So without negative cycles, routes inside a cluster need at most Δ/2 negative edges. The recursive call works with Δ/2, half the previous limit, and after about log n levels the limit is small enough to finish directly.
+
+For the edges that were cut, the randomness does the work. An edge of length ℓ is cut with probability about ℓ · log² n / D, so a shortest route contains only O(log² n) cut edges on average, and the clean-up's hybrid needs only that many rounds.
+
+</DeepDive>
+
+<DeepDive title="What this site implements, and what it simplifies">
+
+The figure above runs real code from this site: the clustering, the recursion, the between-cluster sweep and the hybrid, on the graph you see. Its one simplification is that it aims straight for "every edge ≥ 0" in a single pass, with cluster sizes tuned for a 14-vertex graph.
+
+The site also implements the full algorithm with the scaling loop, and the summary at the end of the figure reports its numbers. It is checked automatically against an independent method on 1,500 random graphs, including graphs with negative cycles. Its clustering step is simpler than the paper's: the paper adds a recursive clean-up that guarantees the clusters are tight in both directions, which matters for the running-time proof but not for correctness.
+
+</DeepDive>
+
+## What happened next
+
+The 2022 paper opened the floodgates. Within a year, Bringmann, Cassis and Fischer removed almost six of the log factors. Later work sped up the clustering step itself. And in 2025, an engineered implementation turned out to be up to almost 100× faster than the classic method on the hardest test graphs. So unlike many theory results, this one looks practical.
+
+There is also a harder version of the problem: weights that are arbitrary real numbers, where the running time may not depend on how big the numbers are. There, nobody had beaten Bellman–Ford's n × m since the 1950s, until Jeremy Fineman did in 2024. Since then the bound has kept falling, and a July 2026 preprint claims almost-linear time for this version too.
+
+<TimelineFigure
+  number="2.7"
+  title="Shortest paths with negative edges: the results"
+  tracks={['classic', 'integer', 'real']}
+  tryThis={<p>Click any result to read what it did. Use the buttons above the list to show only one line of work: watch how long the integer-weight bound stood still before 2022, and how fast it moved after.</p>}
+/>
+
 <Callout kind="ahead">
 
-Next: how Bernstein, Nanongkai and Wulff-Nilsen found such heights in near-linear time in 2022, using random clusters, recursion and the hybrid you just saw. This part of the chapter is still being written.
+That was Dijkstra's first wall. The second is stranger. Dijkstra is fast, but it can never be faster than *sorting*, and in 2024 it was proven to be the best possible algorithm *if you need the vertices in order*. So how did a 2025 algorithm beat it anyway? That's [Chapter 3](#/sorting-barrier).
 
 </Callout>

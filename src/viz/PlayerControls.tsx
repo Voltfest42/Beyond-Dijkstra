@@ -1,9 +1,9 @@
-import type { Playback, Speed } from './usePlayback';
+import type { PlaybackControls, Speed } from './usePlayback';
 import styles from './PlayerControls.module.css';
 
 const SPEED_LABELS: Record<Speed, string> = { slow: 'Slow', normal: 'Normal', fast: 'Fast' };
 
-export function PlayerControls({ playback }: { playback: Playback }) {
+export function PlayerControls({ playback }: { playback: PlaybackControls }) {
   const { step, steps, playing, speed, setSpeed, togglePlay, stepBy, seek } = playback;
   const atStart = step === 0;
   const atEnd = step === steps;

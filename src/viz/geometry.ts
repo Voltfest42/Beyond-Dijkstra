@@ -104,6 +104,33 @@ function f(p: Point): string {
   return `${p.x.toFixed(1)},${p.y.toFixed(1)}`;
 }
 
+/** Convex hull (Andrew's monotone chain), counter-clockwise, without repeated points. */
+export function convexHull(points: readonly Point[]): Point[] {
+  const sorted = [...points].sort((a, b) => a.x - b.x || a.y - b.y);
+  if (sorted.length <= 2) return sorted;
+  const cross = (o: Point, a: Point, b: Point) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  const lower: Point[] = [];
+  for (const p of sorted) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop();
+    lower.push(p);
+  }
+  const upper: Point[] = [];
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    const p = sorted[i];
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop();
+    upper.push(p);
+  }
+  return [...lower.slice(0, -1), ...upper.slice(0, -1)];
+}
+
+/** An SVG path through the hull of the points; drawn with a thick round stroke it becomes a soft blob. */
+export function hullPath(points: readonly Point[]): string {
+  const hull = convexHull(points);
+  if (hull.length === 0) return '';
+  if (hull.length === 1) return `M${f(hull[0])} Z`;
+  return `M${hull.map(f).join(' L')} Z`;
+}
+
 /** viewBox that fits every vertex (plus self-loops and labels) with some margin. */
 export function viewBoxFor(positions: readonly Point[], margin = 48): string {
   if (positions.length === 0) return '0 0 100 100';

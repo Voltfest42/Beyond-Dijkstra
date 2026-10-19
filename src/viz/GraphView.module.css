@@ -242,3 +242,30 @@
   text-anchor: middle;
   fill: var(--text-muted);
 }
+
+/* ---------- clusters and cut edges ---------- */
+
+.hull {
+  fill: var(--cluster);
+  stroke: var(--cluster);
+  stroke-width: 64;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.2;
+}
+
+.clusterBadge {
+  fill: var(--cluster);
+}
+
+.clusterNumber {
+  font-size: 13px;
+  font-weight: 800;
+  text-anchor: middle;
+  fill: #fff;
+}
+
+.cut .edgeLine {
+  stroke-dasharray: 7 5;
+  stroke-width: 2.5;
+}

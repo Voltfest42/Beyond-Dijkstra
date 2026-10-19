@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { vertexLabel, type EdgeId, type Graph, type VertexId } from '../core/graph';
 import type { VisualState } from '../core/trace';
 import { formatDist, formatWeight } from './format';
-import { circleLayout, layoutEdges, NODE_RADIUS, viewBoxFor } from './geometry';
+import { circleLayout, hullPath, layoutEdges, NODE_RADIUS, viewBoxFor } from './geometry';
 import styles from './GraphView.module.css';
 
 interface GraphViewProps {
@@ -19,6 +19,12 @@ interface GraphViewProps {
   showDistances?: boolean;
   selected?: VertexId | null;
   highlightEdges?: ReadonlySet<EdgeId>;
+  /** Groups of vertices drawn as soft coloured outlines (e.g. the clusters of a decomposition). */
+  clusters?: readonly (readonly VertexId[])[];
+  /** Number the clusters 1, 2, 3… in the order given. */
+  numberClusters?: boolean;
+  /** Edges drawn dashed, as removed by a decomposition. */
+  cutEdges?: ReadonlySet<EdgeId>;
   /** Makes vertices clickable (e.g. "start from here"). */
   onVertexClick?: (v: VertexId) => void;
   vertexActionLabel?: (v: VertexId) => string;
@@ -35,6 +41,9 @@ export function GraphView({
   showDistances = true,
   selected = null,
   highlightEdges,
+  clusters,
+  numberClusters = false,
+  cutEdges,
   onVertexClick,
   vertexActionLabel,
 }: GraphViewProps) {
@@ -60,6 +69,27 @@ export function GraphView({
 
   return (
     <svg className={styles.svg} viewBox={viewBox} role="img" aria-label={ariaLabel}>
+      {clusters && (
+        <g aria-hidden="true">
+          {clusters.map((cluster, c) => {
+            const points = cluster.map((v) => positions[v]);
+            const top = points.reduce((best, p) => (p.y < best.y ? p : best), points[0]);
+            return (
+              <g key={c} className={styles.cluster} style={{ ['--cluster' as string]: `var(--cluster-${c % 6})` }}>
+                <path d={hullPath(points)} className={styles.hull} />
+                {numberClusters && (
+                  <g transform={`translate(${top.x - 34} ${top.y - 34})`}>
+                    <circle r={12} className={styles.clusterBadge} />
+                    <text className={styles.clusterNumber} dy="0.35em">
+                      {c + 1}
+                    </text>
+                  </g>
+                )}
+              </g>
+            );
+          })}
+        </g>
+      )}
       <g>
         {edges.map((geo, e) => {
           const weight = weightOf(e);
@@ -69,6 +99,7 @@ export function GraphView({
           if (weight < 0) classes.push(styles.negative);
           if (treeEdges.has(e)) classes.push(styles.tree);
           if (highlightEdges?.has(e)) classes.push(styles.highlight);
+          if (cutEdges?.has(e)) classes.push(styles.cut);
           if (cycleEdges.has(e)) classes.push(styles.cycle);
           if (state.activeEdge === e) {
             classes.push(state.ignoredImprovement ? styles.ignored : state.activeEdgeImproved ? styles.improved : styles.checked);

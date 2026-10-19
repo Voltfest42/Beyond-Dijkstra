@@ -1,5 +1,26 @@
 import type { EdgeSpec } from '../../src/core/graph';
 
+/** Is there a negative cycle anywhere in the graph (reachable or not)? */
+export function hasNegativeCycle(n: number, edges: readonly EdgeSpec[]): boolean {
+  const d = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 0 : Infinity)));
+  for (const { from, to, weight } of edges) d[from][to] = Math.min(d[from][to], weight);
+  for (let k = 0; k < n; k++) {
+    for (let i = 0; i < n; i++) {
+      if (d[i][k] === Infinity) continue;
+      for (let j = 0; j < n; j++) if (d[i][k] + d[k][j] < d[i][j]) d[i][j] = d[i][k] + d[k][j];
+    }
+  }
+  return d.some((row, v) => row[v] < 0);
+}
+
+/** Pairs (u, v) with v reachable from u, by repeated expansion. */
+export function reachability(n: number, edges: readonly EdgeSpec[]): boolean[][] {
+  const r = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => i === j));
+  for (const { from, to } of edges) r[from][to] = true;
+  for (let k = 0; k < n; k++) for (let i = 0; i < n; i++) if (r[i][k]) for (let j = 0; j < n; j++) if (r[k][j]) r[i][j] = true;
+  return r;
+}
+
 /**
  * η: the largest, over reachable vertices v, of the fewest negative edges on
  * any shortest s → v path. Computed by Bellman–Ford on (distance, negative

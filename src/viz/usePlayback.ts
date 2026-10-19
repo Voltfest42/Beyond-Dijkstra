@@ -20,19 +20,61 @@ export function recordRun<R>(graph: Graph, run: (emit: Emit) => R): Recording<R>
 export const SPEEDS = { slow: 1500, normal: 800, fast: 300 } as const;
 export type Speed = keyof typeof SPEEDS;
 
-export interface Playback {
+/** What the player controls need: anything with numbered steps can be played. */
+export interface PlaybackControls {
   /** Current step (0 = the starting picture) and the number of steps. */
   step: number;
   steps: number;
-  state: VisualState;
-  /** What the latest step did, in words ('' at step 0). */
-  caption: string;
   playing: boolean;
   speed: Speed;
   setSpeed: (speed: Speed) => void;
   togglePlay: () => void;
   stepBy: (delta: number) => void;
   seek: (step: number) => void;
+}
+
+export interface Playback extends PlaybackControls {
+  state: VisualState;
+  /** What the latest step did, in words ('' at step 0). */
+  caption: string;
+}
+
+/**
+ * Plain numbered steps with the same controls as a trace (play, step, seek),
+ * for figures that walk through stages rather than single events.
+ * Plays at half the trace speed, since each stage has more to read.
+ */
+export function useStepper(steps: number, resetKey: unknown): PlaybackControls {
+  const [position, setPosition] = useState({ key: resetKey, step: 0, playing: false });
+  const [speed, setSpeed] = useState<Speed>('slow');
+  const current = position.key === resetKey ? position : { key: resetKey, step: 0, playing: false };
+
+  const update = (change: (p: { step: number; playing: boolean }) => { step: number; playing: boolean }) =>
+    setPosition((prev) => ({ key: resetKey, ...change(prev.key === resetKey ? prev : { step: 0, playing: false }) }));
+
+  useEffect(() => {
+    if (!current.playing) return;
+    const timer = window.setInterval(() => {
+      setPosition((prev) => {
+        if (prev.key !== resetKey) return prev;
+        const step = Math.min(prev.step + 1, steps);
+        return { key: resetKey, step, playing: step < steps };
+      });
+    }, SPEEDS[speed] * 2);
+    return () => window.clearInterval(timer);
+  }, [current.playing, resetKey, speed, steps]);
+
+  return {
+    step: current.step,
+    steps,
+    playing: current.playing,
+    speed,
+    setSpeed,
+    togglePlay: () =>
+      update((p) => (p.playing ? { ...p, playing: false } : { step: p.step >= steps ? 0 : p.step, playing: true })),
+    stepBy: (delta) => update((p) => ({ step: clamp(p.step + delta, 0, steps), playing: false })),
+    seek: (step) => update(() => ({ step: clamp(step, 0, steps), playing: false })),
+  };
 }
 
 export function usePlayback(recording: Recording): Playback {
@@ -88,7 +130,7 @@ export function usePlayback(recording: Recording): Playback {
 }
 
 /** Arrow keys / Home / End step through a figure while focus is inside it. */
-export function handlePlaybackKeys(event: KeyboardEvent, playback: Playback): void {
+export function handlePlaybackKeys(event: KeyboardEvent, playback: PlaybackControls): void {
   const target = event.target as HTMLElement;
   if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
   const actions: Record<string, () => void> = {
