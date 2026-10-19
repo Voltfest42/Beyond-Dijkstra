@@ -294,5 +294,5 @@ The work is split into seven stages. The deadline is about a week away, but the 
 
 - **AWS:** the `default` profile in `us-east-1`. CDK needs a one-time `cdk bootstrap` there, which runs with your OK.
 - **Domain:** the `*.cloudfront.net` URL. A custom domain can be added later.
-- **Git:** commits at the end of each stage, pushed to `git@github.com:Voltfest42/Advances-On-Dijkstras-Algorithm.git`.
+- **Git:** commits at the end of each stage, pushed to `git@github.com:Voltfest42/Beyond-Dijkstra.git`.
 - **Name:** "Beyond Dijkstra" is still a working title. Say if you'd like something else.
