@@ -1,0 +1,77 @@
+.wrap {
+  margin-top: 4px;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  max-height: 140px;
+  display: block;
+  font-family: var(--font-sans);
+}
+
+.axis {
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+}
+
+.tick {
+  font-size: 12px;
+  text-anchor: middle;
+  fill: var(--text-muted);
+}
+
+.sweepArea {
+  fill: var(--state-settled);
+  opacity: 0.08;
+}
+
+.sweep {
+  stroke: var(--state-settled);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+
+.marker {
+  transition: transform 0.35s ease;
+}
+
+.marker text {
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.settled circle {
+  fill: var(--state-settled);
+}
+
+.settled text {
+  fill: var(--on-settled);
+}
+
+.frontier circle {
+  fill: var(--surface);
+  stroke: var(--state-frontier);
+  stroke-width: 3;
+}
+
+.frontier text {
+  fill: var(--text);
+}
+
+.legend {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.keySettled {
+  color: var(--state-settled);
+}
+
+.keyFrontier {
+  color: var(--state-frontier);
+  font-weight: 700;
+  margin-left: 10px;
+}

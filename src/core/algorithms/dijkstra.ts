@@ -4,15 +4,15 @@ import type { PseudocodeLine } from '../pseudocode';
 import { assertVertex, type RunOptions, type ShortestPaths } from '../sssp';
 
 export const DIJKSTRA_PSEUDOCODE: readonly PseudocodeLine[] = [
-  { id: 'init', text: 'dist[s] ← 0, every other dist ← ∞, put s in the queue', indent: 0 },
+  { id: 'init', text: 'dist[s] ← 0, others ← ∞; queue ← {s}', indent: 0 },
   { id: 'loop', text: 'while the queue is not empty:', indent: 0 },
-  { id: 'pop', text: 'u ← the queued vertex with the smallest dist', indent: 1 },
-  { id: 'settle', text: 'mark u settled: its distance is now final', indent: 1 },
-  { id: 'scan', text: 'for each edge u → v with weight w:', indent: 1 },
+  { id: 'pop', text: 'u ← queued vertex with smallest dist', indent: 1 },
+  { id: 'settle', text: 'settle u: dist[u] is now final', indent: 1 },
+  { id: 'scan', text: 'for each edge u → v, weight w:', indent: 1 },
   { id: 'skip', text: 'if v is settled: skip it', indent: 2 },
   { id: 'relax', text: 'if dist[u] + w < dist[v]:', indent: 2 },
-  { id: 'update', text: 'dist[v] ← dist[u] + w, and queue v', indent: 3 },
-  { id: 'done', text: 'done: every reachable vertex is settled', indent: 0 },
+  { id: 'update', text: 'dist[v] ← dist[u] + w; queue v', indent: 3 },
+  { id: 'done', text: 'done: all reachable vertices settled', indent: 0 },
 ];
 
 /**

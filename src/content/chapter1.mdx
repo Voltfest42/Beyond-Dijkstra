@@ -1,0 +1,116 @@
+import { DijkstraFigure } from '../figures/DijkstraFigure';
+import { Callout, DeepDive } from '../site/content/blocks';
+import { Term } from '../site/content/Term';
+
+## The shortest-route problem
+
+A <Term id="graph">graph</Term> is a set of points, called <Term id="vertex">vertices</Term>, joined by <Term id="edge">edges</Term>. In this story every edge is a one-way arrow with a number on it, its <Term id="weight">weight</Term>. Picture towns joined by one-way roads labelled with travel times. Or picture a game level: rooms joined by doors, each with a cost to walk through.
+
+The question is always the same. Given a start vertex, what is the shortest distance to *every* other vertex? This is called the <Term id="sssp">single-source shortest paths</Term> problem. Every algorithm in this story solves exactly this problem, and almost all of them are built from one small move:
+
+<Callout title="The one move: relaxing an edge">
+
+Look at an edge **u → v** with weight **w**. If the best known route to u, plus w, is shorter than the best known route to v, then going through u is better: update v's distance. This is called <Term id="relax">relaxing</Term> the edge.
+
+</Callout>
+
+Algorithms differ only in *which* edges they relax, and in *what order*. If you've written pathfinding for a game, you have probably used Dijkstra's algorithm or its goal-directed cousin, A\*.
+
+## How Dijkstra works
+
+Dijkstra's algorithm gives every vertex a <Term id="tentative-distance">tentative distance</Term>. The start vertex gets 0 and everything else gets ∞. Then it grows a region of **settled** vertices outward from the start, one vertex at a time:
+
+1. Take the unsettled vertex with the **smallest** tentative distance.
+2. Declare it <Term id="settled">settled</Term>: its distance is final.
+3. Relax all of its outgoing edges, which may lower the distances of its neighbours.
+
+The vertices waiting their turn are the <Term id="frontier">frontier</Term>. They sit in a <Term id="priority-queue">priority queue</Term>, which can quickly hand back the one with the smallest distance. Step through it below.
+
+<DijkstraFigure
+  number="1.1"
+  title="Dijkstra's algorithm, one step at a time"
+  pickSource
+  tryThis={
+    <p>
+      Step forward until <b>B</b> is settled, and watch <b>A</b>'s distance drop from 4 to 3. The edge B → A offers a
+      cheaper route than the direct road from S. Then click <b>T</b> to start from there. Why does nothing else get
+      reached? (Hint: the edges are one-way.)
+    </p>
+  }
+/>
+
+Notice what the algorithm never does: it never goes back. Each vertex is settled exactly once and each edge is relaxed exactly once. That makes Dijkstra fast. It also gives Dijkstra two habits, and the rest of this story is about those two habits.
+
+## Once settled, never changes
+
+Why is it safe to declare the closest frontier vertex final? Suppose **B** is the closest unsettled vertex, at distance 2. Any *other* route to B has to leave the settled region somewhere, through some frontier vertex. That vertex is already at least 2 away, because B is the closest. Continuing from there to B can only add more distance, so no other route can beat 2.
+
+You can see this in Figure 1.1. Near the end, Dijkstra looks at the edge **D → A**, but A was settled long before. The edge is simply skipped, because nothing found later could make A cheaper.
+
+<Callout title="Habit 1: the future can only add cost">
+
+Dijkstra settles a vertex the moment it is the closest, trusting that no later discovery can undercut it. That trust holds only when **every edge weight is zero or more**.
+
+</Callout>
+
+<Callout kind="ahead">
+
+What if some edges have *negative* weights? Think of a road with a toll refund, or a game path that passes a healing spring. Then a route found later *can* be cheaper, and Dijkstra gives wrong answers. Fixing this efficiently was an open problem for decades, until 2022. That's [Chapter 2](#/negative-edges).
+
+</Callout>
+
+## Vertices come out in sorted order
+
+The second habit follows from the first. Dijkstra always settles the closest remaining vertex, so vertices are settled in order of distance: S at 0, then B at 2, A at 3, C at 8, and so on.
+
+The figure below shows the same run on a number line. Each vertex sits at its current distance. Watch the blue (settled) markers: they appear strictly from left to right, and the dashed sweep line never moves backwards.
+
+<DijkstraFigure
+  number="1.2"
+  title="Settled vertices come out sorted by distance"
+  pickSource
+  showPseudocode={false}
+  showDistanceLine
+  tryThis={
+    <p>
+      Press play at <b>Fast</b> speed and keep your eye on the number line. Tentative (orange) markers jump left when a
+      shorter route is found, but settled (blue) markers only ever appear at the right-hand edge of the blue zone.
+      Click another start vertex: still sorted.
+    </p>
+  }
+/>
+
+So Dijkstra is, secretly, a sorting machine: the order in which it settles vertices is the vertices *sorted by distance*. That matters, because sorting has a famous speed limit. If you can only compare numbers, sorting n of them takes about n log n comparisons, and nothing can do better.
+
+<Callout title="Habit 2: Dijkstra sorts">
+
+Dijkstra settles vertices in order of distance, so it can never be faster than sorting them. With the best <Term id="priority-queue">priority queues</Term> it runs in about **m + n log n** steps: touch every edge once, plus the cost of sorting. For decades nobody knew whether this "sorting barrier" could be beaten on general graphs.
+
+</Callout>
+
+<DeepDive title="Dijkstra's running time, in detail">
+
+Dijkstra does n *extract-min* operations (one per settled vertex) and up to m *decrease-key* operations (one per successful relaxation). The total cost depends on the priority queue:
+
+| Priority queue | extract-min | decrease-key | Dijkstra in total |
+|---|---|---|---|
+| Plain array (Dijkstra, 1959) | O(n) | O(1) | O(n²) |
+| Binary heap (used in these demos) | O(log n) | O(log n) | O((n + m) log n) |
+| Fibonacci heap (Fredman & Tarjan, 1984) | O(log n), amortized | O(1), amortized | O(m + n log n) |
+
+The n log n term is the sorting. For dense graphs (m close to n²) the m term dominates anyway. For sparse graphs such as road networks and game maps, m is close to n, and the n log n term is the bottleneck.
+
+The speed limit belongs to the <Term id="comparison-model">comparison-addition model</Term>, where distances are arbitrary real numbers that can only be compared and added. With small *integer* weights, bit tricks have beaten it since 1999 (Thorup). The open question was general weights.
+
+</DeepDive>
+
+## The two walls
+
+Dijkstra's two habits are also its two limits:
+
+| Habit | The wall it creates | What happened |
+|---|---|---|
+| "Once settled, never changes" | Wrong answers when edges can be **negative**. The safe fallback, Bellman–Ford, is far slower. | **2022:** an algorithm for negative edges that is almost as fast as Dijkstra |
+| "Vertices come out in sorted order" | Never faster than **sorting** the vertices | **2025:** an algorithm that beats Dijkstra on sparse directed graphs by *not* fully sorting |
+
+Both walls stood for decades, and both fell within three years. The next two chapters show how.

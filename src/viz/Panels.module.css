@@ -1,0 +1,91 @@
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.panelTitle {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+.panelTitle:not(:first-child) {
+  margin-top: 14px;
+}
+
+.twoColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px 20px;
+}
+
+.code {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.code li {
+  padding: 3px 6px;
+  border-radius: 5px;
+  border-left: 3px solid transparent;
+}
+
+.activeLine {
+  background: var(--highlight-bg);
+  border-left-color: var(--state-frontier) !important;
+  font-weight: 600;
+}
+
+.chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  border-radius: 999px;
+  padding: 2px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.frontierChip {
+  border: 2px solid var(--state-frontier);
+}
+
+.next {
+  background: var(--highlight-bg);
+}
+
+.nextTag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--state-frontier);
+}
+
+.settledChip {
+  background: var(--state-settled);
+  color: var(--on-settled);
+}
+
+.empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}

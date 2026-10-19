@@ -23,6 +23,9 @@ npm run build      # type-check and build to dist/
 
 ```
 src/core/      algorithms and data structures (pure TypeScript, no UI)
+src/viz/       reusable visual pieces: graph view, step player, panels, distance line
+src/figures/   the interactive figures used in the chapters
+src/site/      site shell: routing, sidebar, pages, glossary, reading progress
 src/content/   chapter text (MDX)
 tests/         unit and property tests (every algorithm vs. an independent reference)
 infra/         AWS CDK app: private S3 bucket + CloudFront

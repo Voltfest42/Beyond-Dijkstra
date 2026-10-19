@@ -106,10 +106,13 @@ export function cloneState(s: VisualState): VisualState {
 /** Applies one event to the state, mutating it in place. */
 export function applyEvent(s: VisualState, event: TraceEvent): void {
   s.step++;
-  // Per-step highlights only last for the event that set them.
-  s.activeEdge = null;
-  s.activeEdgeImproved = null;
-  s.ignoredImprovement = null;
+  // Highlights last until the next action. Bookkeeping that belongs to the same
+  // action (the queue update after a relaxation, captions, line markers) keeps them.
+  if (startsNewAction(event)) {
+    s.activeEdge = null;
+    s.activeEdgeImproved = null;
+    s.ignoredImprovement = null;
+  }
 
   switch (event.kind) {
     case 'source':
@@ -160,6 +163,20 @@ export function applyEvent(s: VisualState, event: TraceEvent): void {
       s.current = null;
       s.line = null;
       break;
+  }
+}
+
+function startsNewAction(event: TraceEvent): boolean {
+  switch (event.kind) {
+    case 'relax':
+    case 'source':
+    case 'negative-cycle':
+    case 'done':
+      return true;
+    case 'queue':
+      return event.op === 'pop';
+    default:
+      return false;
   }
 }
 

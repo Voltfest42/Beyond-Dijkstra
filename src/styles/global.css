@@ -13,8 +13,12 @@
   --state-unvisited: #a3a8b3;
   --state-frontier: #f59e0b;
   --state-settled: #2563eb;
+  --on-settled: #ffffff;
+  --state-improved: #0d9488;
+  --edge-default: #b9bdc6;
   --edge-negative: #dc2626;
   --edge-tree: #1c1f24;
+  --highlight-bg: #fff6e0;
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
@@ -32,9 +36,13 @@
 
     --state-unvisited: #6b7280;
     --state-frontier: #fbbf24;
-    --state-settled: #6b9bff;
+    --state-settled: #4f84f5;
+    --on-settled: #ffffff;
+    --state-improved: #2dd4bf;
+    --edge-default: #4a505c;
     --edge-negative: #f87171;
     --edge-tree: #e8e9ec;
+    --highlight-bg: #3a2f14;
   }
 }
 
@@ -67,6 +75,20 @@ a {
   color: var(--accent);
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -74,4 +96,14 @@ a {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+kbd {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--surface);
 }

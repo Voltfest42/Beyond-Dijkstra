@@ -1,0 +1,218 @@
+.svg {
+  width: 100%;
+  height: auto;
+  /* The aspect ratio is kept (centred), so wide figures don't grow taller than the screen. */
+  max-height: 400px;
+  display: block;
+  font-family: var(--font-sans);
+  user-select: none;
+}
+
+/* ---------- edges ---------- */
+
+.edge {
+  --edge-color: var(--edge-default);
+}
+
+.edgeLine {
+  fill: none;
+  stroke: var(--edge-color);
+  stroke-width: 2;
+  transition: stroke 0.2s, stroke-width 0.2s;
+}
+
+.arrow {
+  fill: var(--edge-color);
+  transition: fill 0.2s;
+}
+
+.weightBg {
+  fill: var(--surface);
+  stroke: var(--border);
+}
+
+.weight {
+  font-size: 15px;
+  font-weight: 600;
+  text-anchor: middle;
+  fill: var(--text-muted);
+}
+
+.negative {
+  --edge-color: var(--edge-negative);
+}
+
+.negative .weight {
+  fill: var(--edge-negative);
+}
+
+.tree {
+  --edge-color: var(--edge-tree);
+}
+
+.tree .edgeLine {
+  stroke-width: 3.5;
+}
+
+.cycle {
+  --edge-color: var(--edge-negative);
+}
+
+.cycle .edgeLine {
+  stroke-width: 4;
+  stroke-dasharray: 8 5;
+}
+
+.improved {
+  --edge-color: var(--state-improved);
+}
+
+.improved .edgeLine {
+  stroke-width: 4.5;
+}
+
+.checked {
+  --edge-color: var(--text-muted);
+}
+
+.checked .edgeLine {
+  stroke-width: 3.5;
+  stroke-dasharray: 6 5;
+}
+
+.ignored {
+  --edge-color: var(--edge-negative);
+}
+
+.ignored .edgeLine {
+  stroke-width: 4.5;
+  stroke-dasharray: 3 5;
+}
+
+.improved .weightBg,
+.checked .weightBg,
+.ignored .weightBg {
+  stroke: var(--edge-color);
+  stroke-width: 2;
+}
+
+/* ---------- vertices ---------- */
+
+.vertex .disc {
+  stroke-width: 3;
+  transition: fill 0.2s, stroke 0.2s;
+}
+
+.label {
+  font-size: 18px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.unvisited .disc {
+  fill: var(--surface);
+  stroke: var(--state-unvisited);
+}
+
+.unvisited .label {
+  fill: var(--text-muted);
+}
+
+.frontier .disc {
+  fill: var(--surface);
+  stroke: var(--state-frontier);
+  stroke-width: 4;
+}
+
+.frontier .label {
+  fill: var(--text);
+}
+
+.settled .disc {
+  fill: var(--state-settled);
+  stroke: var(--state-settled);
+}
+
+.settled .label {
+  fill: var(--on-settled);
+}
+
+.halo {
+  fill: none;
+  stroke: var(--state-frontier);
+  stroke-width: 3;
+  opacity: 0.6;
+  animation: pulse 1.2s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.25;
+  }
+}
+
+.distBg {
+  fill: var(--surface);
+  stroke: var(--border);
+}
+
+.settled .distBg {
+  fill: var(--state-settled);
+  stroke: var(--state-settled);
+}
+
+.dist {
+  font-size: 15px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: var(--text);
+}
+
+.unvisited .dist {
+  fill: var(--text-muted);
+}
+
+.settled .dist {
+  fill: var(--on-settled);
+}
+
+.sourceTag {
+  font-size: 11px;
+  font-weight: 600;
+  text-anchor: middle;
+  fill: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.wrongBg {
+  fill: var(--edge-negative);
+}
+
+.wrong {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: #fff;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:focus {
+  outline: none;
+}
+
+.clickable:focus-visible .disc,
+.clickable:hover .disc {
+  stroke-width: 5;
+}

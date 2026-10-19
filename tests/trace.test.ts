@@ -64,9 +64,11 @@ describe('trace replay', () => {
     ]);
     const { events } = recordTrace((emit) => dijkstra(g, 0, { emit }));
     const player = new TracePlayer(g, events);
-    const flagged = Array.from({ length: events.length + 1 }, (_, i) => player.stateAt(i).ignoredImprovement).filter(
-      Boolean,
+    const flagged = new Set(
+      Array.from({ length: events.length + 1 }, (_, i) => player.stateAt(i).ignoredImprovement)
+        .filter(Boolean)
+        .map((x) => JSON.stringify(x)),
     );
-    expect(flagged).toEqual([{ edge: 2, candidate: 1 }]);
+    expect([...flagged]).toEqual([JSON.stringify({ edge: 2, candidate: 1 })]);
   });
 });
