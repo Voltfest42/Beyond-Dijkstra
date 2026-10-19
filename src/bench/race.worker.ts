@@ -1,4 +1,4 @@
-import { raceOnce, type RaceMessage, type RaceRequest } from './race';
+import { raceOnce, timerResolution, type RaceMessage, type RaceRequest } from './race';
 
 // The project is type-checked with DOM types; inside a worker only these two members are used.
 const worker = self as unknown as {
@@ -10,8 +10,10 @@ const worker = self as unknown as {
 worker.onmessage = (event) => {
   const post = (message: RaceMessage) => worker.postMessage(message);
   try {
-    raceOnce(1_000); // warm up the JIT so the first real size isn't penalised
-    for (const n of event.data.sizes) post({ kind: 'result', result: raceOnce(n) });
+    const resolution = timerResolution();
+    post({ kind: 'timer', resolutionMs: resolution });
+    raceOnce(1_000, { resolution }); // warm up the JIT so the first real size isn't penalised
+    for (const n of event.data.sizes) post({ kind: 'result', result: raceOnce(n, { resolution }) });
     post({ kind: 'done' });
   } catch (error) {
     post({ kind: 'error', message: error instanceof Error ? error.message : String(error) });

@@ -10,8 +10,10 @@ import raceStyles from './RaceFigure.module.css';
 
 type Status = 'idle' | 'running' | 'done' | 'cancelled' | 'error';
 
-const ratio = (r: RaceResult) => r.bmsspMs / Math.max(r.dijkstraMs, 1e-6);
-const times = (x: number) => `×${x >= 10 ? x.toFixed(0) : x.toFixed(1)}`;
+// A time the clock couldn't measure (0 ms) gives no ratio rather than a nonsense one.
+const ratio = (r: RaceResult) => (r.dijkstraMs > 0 && r.bmsspMs > 0 ? r.bmsspMs / r.dijkstraMs : NaN);
+const times = (x: number) => (Number.isFinite(x) ? `×${x >= 10 ? x.toFixed(0) : x.toFixed(1)}` : '–');
+const formatTick = (x: number) => (x < 0.01 ? `${(x * 1000).toFixed(1)} µs` : x < 1 ? `${+x.toFixed(2)} ms` : `${+x.toFixed(1)} ms`);
 const ms = (x: number) => (x < 10 ? `${x.toFixed(1)} ms` : `${Math.round(x).toLocaleString('en')} ms`);
 
 export function RaceFigure({ number, tryThis }: { number: string; tryThis?: ReactNode }) {
@@ -27,6 +29,7 @@ function RaceInner({ number, tryThis }: { number: string; tryThis?: ReactNode })
   const [results, setResults] = useState<RaceResult[]>([]);
   const [error, setError] = useState('');
   const [largest, setLargest] = useState<number>(100_000);
+  const [resolution, setResolution] = useState<number | null>(null);
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => () => workerRef.current?.terminate(), []);
@@ -42,7 +45,8 @@ function RaceInner({ number, tryThis }: { number: string; tryThis?: ReactNode })
     setStatus('running');
     worker.onmessage = (event: MessageEvent<RaceMessage>) => {
       const message = event.data;
-      if (message.kind === 'result') setResults((rs) => [...rs, message.result]);
+      if (message.kind === 'timer') setResolution(message.resolutionMs);
+      else if (message.kind === 'result') setResults((rs) => [...rs, message.result]);
       else if (message.kind === 'done') {
         setStatus('done');
         worker.terminate();
@@ -67,12 +71,19 @@ function RaceInner({ number, tryThis }: { number: string; tryThis?: ReactNode })
 
   const refResults = reference.results as RaceResult[];
   const series: Series[] = [
-    { name: 'Your browser', color: 'var(--series-1)', points: results.map((r) => ({ x: r.n, y: ratio(r) })) },
+    {
+      name: 'Your browser',
+      color: 'var(--series-1)',
+      points: results.map((r) => ({ x: r.n, y: ratio(r) })).filter((p) => Number.isFinite(p.y)),
+    },
     {
       name: 'Reference run',
       color: 'var(--series-2)',
       dashed: true,
-      points: refResults.filter((r) => r.n <= largest).map((r) => ({ x: r.n, y: ratio(r) })),
+      points: refResults
+        .filter((r) => r.n <= largest)
+        .map((r) => ({ x: r.n, y: ratio(r) }))
+        .filter((p) => Number.isFinite(p.y)),
     },
   ];
   const rows = results.length > 0 ? results : refResults.filter((r) => r.n <= largest);
@@ -145,8 +156,10 @@ function RaceInner({ number, tryThis }: { number: string; tryThis?: ReactNode })
       </table>
       {disagree && <p className={styles.bad}>The two algorithms disagreed on some distance. Please report this.</p>}
       <p className={styles.note}>
-        Random sparse directed graphs with 3 edges per vertex and real-valued weights. Times are the best of 3 runs, in
-        a background thread. Both implementations are this site's own TypeScript, and every run checks that they agree on
+        Random sparse directed graphs with 3 edges per vertex and real-valued weights. Browsers round their clocks for
+        privacy{resolution !== null && ` (yours ticks every ${formatTick(resolution)})`}, so each time is measured by
+        repeating the algorithm for at least 30 ms (and 20 clock ticks) and taking the average; the best of 3 such
+        measurements is shown. Everything runs in a background thread. Both implementations are this site's own TypeScript, and every run checks that they agree on
         every distance{results.length > 0 && !disagree ? ' (they did)' : ''}. The reference run was recorded on{' '}
         {reference.machine} on {reference.recorded}.
       </p>

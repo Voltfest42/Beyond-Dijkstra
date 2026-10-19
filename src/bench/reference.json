@@ -5,8 +5,8 @@
     {
       "n": 1000,
       "m": 3000,
-      "dijkstraMs": 0.11070000000000846,
-      "bmsspMs": 1.384999999999991,
+      "dijkstraMs": 0.07306009732360093,
+      "bmsspMs": 0.9273969696969702,
       "dijkstraComparisons": 16981,
       "bmsspComparisons": 35726,
       "agree": true
@@ -14,8 +14,8 @@
     {
       "n": 3000,
       "m": 9000,
-      "dijkstraMs": 0.3669999999999902,
-      "bmsspMs": 3.6213000000000193,
+      "dijkstraMs": 0.32801086956521763,
+      "bmsspMs": 2.5872500000000023,
       "dijkstraComparisons": 59623,
       "bmsspComparisons": 107877,
       "agree": true
@@ -23,8 +23,8 @@
     {
       "n": 10000,
       "m": 30000,
-      "dijkstraMs": 1.2757999999999754,
-      "bmsspMs": 10.455399999999997,
+      "dijkstraMs": 1.3162217391304347,
+      "bmsspMs": 10.136833333333357,
       "dijkstraComparisons": 234118,
       "bmsspComparisons": 393771,
       "agree": true
@@ -32,8 +32,8 @@
     {
       "n": 30000,
       "m": 90000,
-      "dijkstraMs": 4.682700000000011,
-      "bmsspMs": 42.89220000000003,
+      "dijkstraMs": 4.686571428571418,
+      "bmsspMs": 35.728200000000015,
       "dijkstraComparisons": 794138,
       "bmsspComparisons": 1228996,
       "agree": true
@@ -41,8 +41,8 @@
     {
       "n": 100000,
       "m": 300000,
-      "dijkstraMs": 21.227199999999925,
-      "bmsspMs": 140.0553,
+      "dijkstraMs": 22.603650000000016,
+      "bmsspMs": 149.6473000000001,
       "dijkstraComparisons": 2984300,
       "bmsspComparisons": 3872323,
       "agree": true
@@ -50,8 +50,8 @@
     {
       "n": 300000,
       "m": 900000,
-      "dijkstraMs": 109.19240000000036,
-      "bmsspMs": 639.1277,
+      "dijkstraMs": 109.55920000000015,
+      "bmsspMs": 656.674,
       "dijkstraComparisons": 9914764,
       "bmsspComparisons": 12788194,
       "agree": true

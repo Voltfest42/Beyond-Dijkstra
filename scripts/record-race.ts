@@ -2,12 +2,13 @@
 // Usage: npx tsx scripts/record-race.ts
 import { writeFileSync } from 'node:fs';
 import { cpus } from 'node:os';
-import { RACE_SIZES, raceOnce } from '../src/bench/race.ts';
+import { RACE_SIZES, raceOnce, timerResolution } from '../src/bench/race.ts';
 
-raceOnce(1_000);
+const resolution = timerResolution();
+raceOnce(1_000, { resolution });
 const results = [];
 for (const n of RACE_SIZES) {
-  const r = raceOnce(n);
+  const r = raceOnce(n, { resolution });
   console.log(
     `n=${n}: Dijkstra ${r.dijkstraMs.toFixed(1)} ms, new ${r.bmsspMs.toFixed(1)} ms (×${(r.bmsspMs / r.dijkstraMs).toFixed(1)}), agree=${r.agree}`,
   );
