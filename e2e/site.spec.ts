@@ -70,6 +70,35 @@ test.describe('dark mode', () => {
   });
 });
 
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 1920, height: 1080 },
+  { width: 3840, height: 2160 },
+]) {
+  test(`sidebar highlights the last section at the bottom of each chapter (${viewport.width}×${viewport.height})`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    const lastSections = {
+      dijkstra: 'The two walls',
+      'negative-edges': 'What happened next',
+      'sorting-barrier': 'Epilogue: 2026',
+      'what-it-means': 'Further reading',
+    };
+    for (const [slug, last] of Object.entries(lastSections)) {
+      await page.goto(`/#/${slug}`);
+      await expect(page.locator('figure').first()).toBeVisible();
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      const sidebar = page.getByRole('navigation', { name: 'Contents' });
+      await expect(sidebar.getByRole('link', { name: last, exact: true })).toHaveAttribute('aria-current', 'location');
+    }
+  });
+}
+
+test('sidebar highlights a section in the middle of a chapter', async ({ page }) => {
+  await page.goto('/#/dijkstra/once-settled-never-changes');
+  const sidebar = page.getByRole('navigation', { name: 'Contents' });
+  await expect(sidebar.getByRole('link', { name: 'Once settled, never changes' })).toHaveAttribute('aria-current', 'location');
+});
+
 test('section deep links scroll to their heading', async ({ page }) => {
   await page.goto('/#/sorting-barrier/idea-2-divide-and-conquer-by-distance');
   const heading = page.getByRole('heading', { name: /Idea 2: divide and conquer/ });

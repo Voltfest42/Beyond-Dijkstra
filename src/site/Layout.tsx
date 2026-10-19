@@ -71,6 +71,7 @@ export function Layout({ children }: { children: ReactNode }) {
                           <a
                             href={href(c.slug, id)}
                             className={id === activeSection ? styles.activeSection : undefined}
+                            aria-current={id === activeSection ? 'location' : undefined}
                             onClick={() => {
                               // Same URL as now: no hashchange will fire, so scroll directly.
                               if (window.location.hash === href(c.slug, id)) scrollToSection(id);
@@ -109,7 +110,15 @@ export function Layout({ children }: { children: ReactNode }) {
   );
 }
 
-/** The last section heading scrolled past, for highlighting in the sidebar. */
+/** Headings above this line (px from the top of the window) count as "scrolled past". */
+const ACTIVE_LINE = 140;
+
+/**
+ * The section being read, for highlighting in the sidebar: normally the last
+ * heading scrolled past the line near the top of the window. A short final
+ * section can never reach that line, because the page runs out first, so once
+ * the page is scrolled to the very bottom, the last heading visible on screen wins.
+ */
 function useActiveSection(ids: readonly string[]): string | null {
   const [active, setActive] = useState<string | null>(null);
   const key = ids.join('|');
@@ -119,20 +128,24 @@ function useActiveSection(ids: readonly string[]): string | null {
     let frame = 0;
     const update = () => {
       frame = 0;
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      const line = atBottom ? window.innerHeight : ACTIVE_LINE;
       let current: string | null = null;
       for (const id of sectionIds) {
         const element = document.getElementById(id);
-        if (element && element.getBoundingClientRect().top < 140) current = id;
+        if (element && element.getBoundingClientRect().top < line) current = id;
       }
       setActive(current);
     };
-    const onScroll = () => {
+    const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
     update();
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
       if (frame) cancelAnimationFrame(frame);
     };
   }, [key]);
