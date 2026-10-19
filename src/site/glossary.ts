@@ -21,6 +21,8 @@ export const GLOSSARY = {
   eta: 'η (the Greek letter eta): the largest number of negative edges that any vertex’s shortest route needs. The hybrid algorithm takes at most η + 1 rounds.',
   'a-star':
     'A*: Dijkstra with a guess (a heuristic) of the remaining distance to the goal, so it explores towards the goal first. Widely used for pathfinding in games.',
+  pivot:
+    'In the 2025 algorithm, a frontier vertex whose shortest-path tree (within a few hops) has at least k vertices. Only pivots go into the sorted structure; everything in smaller trees is finished without sorting.',
   'big-o':
     'A way to say how the work grows with the size of the input, ignoring constant factors. O(m) means "proportional to the number of edges".',
   log: 'log₂ n is how many times you can halve n before reaching 1. For a million it is about 20, so log factors grow very slowly.',

@@ -69,6 +69,42 @@ export function randomGraph(options: RandomGraphOptions): Graph {
   return createGraph(n, edges);
 }
 
+/**
+ * A rows × cols grid with two-way moves between neighbouring cells, each
+ * direction with its own random cost: a small game map with varied terrain.
+ */
+export function gridGraph({
+  rows,
+  cols,
+  minWeight = 1,
+  maxWeight = 9,
+  seed = 1,
+}: {
+  rows: number;
+  cols: number;
+  minWeight?: number;
+  maxWeight?: number;
+  seed?: number;
+}): Graph {
+  const random = seededRandom(seed);
+  const weight = () => minWeight + Math.floor(random() * (maxWeight - minWeight + 1));
+  const edges: EdgeSpec[] = [];
+  const id = (r: number, c: number) => r * cols + c;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (c + 1 < cols) {
+        edges.push({ from: id(r, c), to: id(r, c + 1), weight: weight() });
+        edges.push({ from: id(r, c + 1), to: id(r, c), weight: weight() });
+      }
+      if (r + 1 < rows) {
+        edges.push({ from: id(r, c), to: id(r + 1, c), weight: weight() });
+        edges.push({ from: id(r + 1, c), to: id(r, c), weight: weight() });
+      }
+    }
+  }
+  return createGraph(rows * cols, edges);
+}
+
 function shuffle<T>(items: T[], random: () => number): T[] {
   for (let i = items.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));

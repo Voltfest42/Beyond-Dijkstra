@@ -13,7 +13,21 @@ const STACK = 24;
  * A number line with every vertex placed at its current distance. Dijkstra's
  * settled vertices fill it from left to right, which is the "sorted order" point.
  */
-export function DistanceLine({ graph, state, max }: { graph: Graph; state: VisualState; max: number }) {
+export function DistanceLine({
+  graph,
+  state,
+  max,
+  band,
+  showSweep = true,
+}: {
+  graph: Graph;
+  state: VisualState;
+  max: number;
+  /** A distance range to shade, e.g. the current recursive call's [lower, bound). */
+  band?: { from: number; to: number; label: string } | null;
+  /** Dijkstra's "everything left of here is settled" sweep line. */
+  showSweep?: boolean;
+}) {
   const scaleMax = max > 0 ? max : 1;
   const x = (d: number) => LEFT + (d / scaleMax) * (WIDTH - LEFT - RIGHT);
 
@@ -30,7 +44,9 @@ export function DistanceLine({ graph, state, max }: { graph: Graph; state: Visua
   }
 
   const lastSettled = state.settledOrder.at(-1);
-  const sweep = lastSettled === undefined ? null : x(state.dist[lastSettled]);
+  const sweep = !showSweep || lastSettled === undefined ? null : x(state.dist[lastSettled]);
+  const bandFrom = band ? x(Math.min(band.from, scaleMax)) : 0;
+  const bandTo = band ? (Number.isFinite(band.to) ? x(Math.min(band.to, scaleMax)) : WIDTH - RIGHT + 8) : 0;
   const ticks = niceTicks(scaleMax);
   const unreached = state.dist.filter((d) => !Number.isFinite(d)).length;
 
@@ -44,6 +60,14 @@ export function DistanceLine({ graph, state, max }: { graph: Graph; state: Visua
           .map((v) => `${vertexLabel(graph, v)} at ${formatDist(state.dist[v])}`)
           .join(', ') || 'none yet'}.`}
       >
+        {band && (
+          <g>
+            <rect x={bandFrom - 12} y={6} width={Math.max(bandTo - bandFrom + 24, 24)} height={AXIS_Y - 6} rx={8} className={styles.band} />
+            <text x={bandFrom - 8} y={20} className={styles.bandLabel}>
+              {band.label}
+            </text>
+          </g>
+        )}
         {sweep !== null && (
           <g>
             <rect x={LEFT - 6} y={14} width={sweep - LEFT + 12} height={AXIS_Y - 14} className={styles.sweepArea} rx={6} />

@@ -10,3 +10,10 @@ export function formatDist(d: number): string {
 export function formatWeight(w: number): string {
   return formatDist(w);
 }
+
+/** 1,284 → 1.3K; 2,500,000 → 2.5M. */
+export function compactNumber(v: number): string {
+  if (v >= 1_000_000) return `${+(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 1000) return `${+(v / 1000).toFixed(1)}K`;
+  return String(+v.toFixed(1));
+}

@@ -75,3 +75,17 @@
   font-weight: 700;
   margin-left: 10px;
 }
+
+.band {
+  fill: var(--accent);
+  fill-opacity: 0.08;
+  stroke: var(--accent);
+  stroke-opacity: 0.6;
+  stroke-dasharray: 5 4;
+}
+
+.bandLabel {
+  font-size: 11.5px;
+  font-weight: 600;
+  fill: var(--accent);
+}

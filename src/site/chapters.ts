@@ -48,7 +48,14 @@ export const CHAPTERS: readonly ChapterInfo[] = [
     number: 3,
     title: 'Wall 2: the sorting barrier',
     blurb: 'How a 2025 algorithm beats Dijkstra by refusing to sort everything.',
-    sections: [],
+    sections: [
+      'Dijkstra is a sorting machine',
+      'The 2024 twist: Dijkstra is the best possible',
+      'Where the time goes: the frontier',
+      'Idea 1: shrink the frontier with a little Bellman–Ford',
+      'Idea 2: divide and conquer by distance',
+    ],
+    load: () => import('../content/chapter3.mdx'),
   },
   {
     slug: 'what-it-means',

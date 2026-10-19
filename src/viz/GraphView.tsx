@@ -25,6 +25,10 @@ interface GraphViewProps {
   numberClusters?: boolean;
   /** Edges drawn dashed, as removed by a decomposition. */
   cutEdges?: ReadonlySet<EdgeId>;
+  /** Vertices with a ★ badge (pivots). */
+  starred?: ReadonlySet<VertexId>;
+  /** Vertices with a dashed ring (the sources of the current call). */
+  ringed?: ReadonlySet<VertexId>;
   /** Makes vertices clickable (e.g. "start from here"). */
   onVertexClick?: (v: VertexId) => void;
   vertexActionLabel?: (v: VertexId) => string;
@@ -44,6 +48,8 @@ export function GraphView({
   clusters,
   numberClusters = false,
   cutEdges,
+  starred,
+  ringed,
   onVertexClick,
   vertexActionLabel,
 }: GraphViewProps) {
@@ -159,6 +165,7 @@ export function GraphView({
               {(state.current === v || selected === v) && (
                 <circle r={NODE_RADIUS + 7} className={state.current === v ? styles.halo : styles.selectRing} />
               )}
+              {ringed?.has(v) && <circle r={NODE_RADIUS + 6} className={styles.sourceRing} />}
               <circle r={NODE_RADIUS} className={styles.disc} />
               <text className={styles.label} dy="0.35em">
                 {label}
@@ -181,6 +188,14 @@ export function GraphView({
                   <rect x={-5} y={-12} width={distWidth(dist)} height={23} rx={11.5} className={styles.distBg} />
                   <text className={styles.dist} x={distWidth(dist) / 2 - 5} dy="0.32em">
                     {formatDist(dist)}
+                  </text>
+                </g>
+              )}
+              {starred?.has(v) && (
+                <g transform={`translate(${-NODE_RADIUS + 1} ${-NODE_RADIUS + 1})`} aria-hidden="true">
+                  <circle r={10} className={styles.starBg} />
+                  <text className={styles.star} dy="0.36em">
+                    ★
                   </text>
                 </g>
               )}

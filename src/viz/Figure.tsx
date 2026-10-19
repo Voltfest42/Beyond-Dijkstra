@@ -50,7 +50,10 @@ export type LegendItem =
   | 'cycle'
   | 'route'
   | 'cluster'
-  | 'cut';
+  | 'cut'
+  | 'pivot'
+  | 'sources'
+  | 'forest';
 
 const LEGEND: Record<LegendItem, { label: string; symbol: ReactNode }> = {
   unvisited: { label: 'not reached', symbol: <circle r="7" className={styles.kUnvisited} /> },
@@ -65,6 +68,19 @@ const LEGEND: Record<LegendItem, { label: string; symbol: ReactNode }> = {
   route: { label: 'highlighted route', symbol: <line x1="-9" x2="9" className={styles.kRoute} /> },
   cluster: { label: 'cluster', symbol: <circle r="9" className={styles.kCluster} /> },
   cut: { label: 'cut edge', symbol: <line x1="-9" x2="9" className={styles.kCut} /> },
+  pivot: {
+    label: 'pivot',
+    symbol: (
+      <>
+        <circle r="9" className={styles.kPivot} />
+        <text className={styles.kStar} dy="0.36em">
+          ★
+        </text>
+      </>
+    ),
+  },
+  sources: { label: 'sources of the current step', symbol: <circle r="7" className={styles.kSources} /> },
+  forest: { label: 'shortest-path tree found', symbol: <line x1="-9" x2="9" className={styles.kRoute} /> },
 };
 
 export function Legend({ items }: { items: readonly LegendItem[] }) {

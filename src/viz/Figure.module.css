@@ -155,3 +155,20 @@
   stroke-width: 2.5;
   stroke-dasharray: 4 3;
 }
+
+.kPivot {
+  fill: var(--state-frontier);
+}
+
+.kStar {
+  font-size: 11px;
+  text-anchor: middle;
+  fill: #fff;
+}
+
+.kSources {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 3 2;
+}

@@ -169,6 +169,97 @@ export const BNW_DEMO = buildPreset({
 });
 
 /**
+ * FindPivots demo: s is already settled, and A, B, C, D form the frontier.
+ * Their shortest-path trees have 5 (A), 2 (B), 4 (C) and 1 (D) vertices, and
+ * A's tree is 3 hops deep. With k = 3 the pivots are A and C; with k = 2 the
+ * search grows past k × 4 = 8 vertices and stops early; with k = 4, A and C again.
+ */
+export const FINDPIVOTS_DEMO = buildPreset({
+  vertices: [
+    { label: 's', x: 60, y: 220 },
+    { label: 'A', x: 220, y: 70 },
+    { label: 'B', x: 220, y: 180 },
+    { label: 'C', x: 220, y: 290 },
+    { label: 'D', x: 220, y: 390 },
+    { label: 'a1', x: 380, y: 50 },
+    { label: 'a2', x: 530, y: 30 },
+    { label: 'a3', x: 530, y: 115 },
+    { label: 'a4', x: 680, y: 50 },
+    { label: 'b1', x: 380, y: 180 },
+    { label: 'c1', x: 380, y: 270 },
+    { label: 'c2', x: 530, y: 260 },
+    { label: 'c3', x: 380, y: 360 },
+  ],
+  edges: [
+    ['s', 'A', 2],
+    ['s', 'B', 3],
+    ['s', 'C', 4],
+    ['s', 'D', 6],
+    ['A', 'a1', 1],
+    ['a1', 'a2', 1],
+    ['a1', 'a3', 2],
+    ['a2', 'a4', 1],
+    ['B', 'b1', 2],
+    ['C', 'c1', 1],
+    ['c1', 'c2', 1],
+    ['C', 'c3', 2],
+  ],
+});
+
+/** The 2025 algorithm's walkthrough: four layers fanning out from S and back into T. */
+export const BMSSP_DEMO = buildPreset({
+  vertices: [
+    { label: 'S', x: 50, y: 220 },
+    { label: 'A', x: 165, y: 100 },
+    { label: 'B', x: 165, y: 220 },
+    { label: 'C', x: 165, y: 340 },
+    { label: 'D', x: 290, y: 50 },
+    { label: 'E', x: 290, y: 165 },
+    { label: 'F', x: 290, y: 280 },
+    { label: 'G', x: 290, y: 395 },
+    { label: 'H', x: 420, y: 100 },
+    { label: 'I', x: 420, y: 220 },
+    { label: 'J', x: 420, y: 340 },
+    { label: 'K', x: 550, y: 50 },
+    { label: 'L', x: 550, y: 165 },
+    { label: 'M', x: 550, y: 280 },
+    { label: 'N', x: 550, y: 395 },
+    { label: 'T', x: 680, y: 220 },
+  ],
+  edges: [
+    ['S', 'A', 3],
+    ['S', 'B', 1],
+    ['S', 'C', 4],
+    ['B', 'A', 1],
+    ['A', 'D', 2],
+    ['A', 'E', 4],
+    ['B', 'E', 2],
+    ['B', 'F', 3],
+    ['C', 'F', 1],
+    ['C', 'G', 2],
+    ['D', 'E', 1],
+    ['D', 'H', 3],
+    ['E', 'H', 2],
+    ['E', 'I', 3],
+    ['F', 'I', 1],
+    ['F', 'J', 4],
+    ['G', 'J', 2],
+    ['G', 'N', 6],
+    ['H', 'K', 2],
+    ['H', 'L', 3],
+    ['I', 'L', 1],
+    ['I', 'M', 2],
+    ['J', 'M', 3],
+    ['J', 'N', 1],
+    ['M', 'L', 1],
+    ['K', 'T', 5],
+    ['L', 'T', 3],
+    ['M', 'T', 2],
+    ['N', 'T', 4],
+  ],
+});
+
+/**
  * Chapter 1's map. Starting from S it shows every behaviour worth seeing:
  * decrease-keys (A: 4 → 3, E: 12 → 11), a "not shorter" relaxation (C → D),
  * an edge into an already-settled vertex (D → A), and a tie (E and F at 11).

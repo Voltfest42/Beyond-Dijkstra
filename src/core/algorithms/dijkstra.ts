@@ -1,7 +1,7 @@
 import type { Graph, VertexId } from '../graph';
 import { IndexedMinHeap } from '../heap';
 import type { PseudocodeLine } from '../pseudocode';
-import { assertVertex, type RunOptions, type ShortestPaths } from '../sssp';
+import { assertVertex, newStats, type RunOptions, type ShortestPaths } from '../sssp';
 
 export const DIJKSTRA_PSEUDOCODE: readonly PseudocodeLine[] = [
   { id: 'init', text: 'dist[s] ← 0, others ← ∞; queue ← {s}', indent: 0 },
@@ -14,6 +14,40 @@ export const DIJKSTRA_PSEUDOCODE: readonly PseudocodeLine[] = [
   { id: 'update', text: 'dist[v] ← dist[u] + w; queue v', indent: 3 },
   { id: 'done', text: 'done: all reachable vertices settled', indent: 0 },
 ];
+
+/**
+ * Dijkstra, measuring its frontier: sizes[i] is how many vertices wait in the
+ * priority queue right after the (i + 1)-th vertex is settled. Also counts the
+ * heap's comparisons, which is where the "sorting" cost lives.
+ */
+export function frontierProfile(g: Graph, source: VertexId): { sizes: Int32Array; comparisons: number; settled: number } {
+  assertVertex(g, source);
+  const { n, outStart, outEdges, edgeTo, edgeWeight } = g;
+  const stats = newStats();
+  const dist = new Float64Array(n).fill(Infinity);
+  const settled = new Uint8Array(n);
+  const queue = new IndexedMinHeap(n, stats);
+  const sizes = new Int32Array(n);
+  let count = 0;
+  dist[source] = 0;
+  queue.pushOrDecrease(source, 0);
+  while (queue.size > 0) {
+    const u = queue.pop();
+    settled[u] = 1;
+    for (let i = outStart[u]; i < outStart[u + 1]; i++) {
+      const e = outEdges[i];
+      const v = edgeTo[e];
+      if (settled[v]) continue;
+      const candidate = dist[u] + edgeWeight[e];
+      if (candidate < dist[v]) {
+        dist[v] = candidate;
+        queue.pushOrDecrease(v, candidate);
+      }
+    }
+    sizes[count++] = queue.size;
+  }
+  return { sizes: sizes.slice(0, count), comparisons: stats.comparisons, settled: count };
+}
 
 /**
  * Textbook Dijkstra with a binary heap: O((n + m) log n).

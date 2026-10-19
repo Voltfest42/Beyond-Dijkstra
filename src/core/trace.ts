@@ -33,7 +33,29 @@ export type TraceEvent =
   /** Start of a Bellman–Ford-style round. */
   | { kind: 'round'; round: number }
   | { kind: 'negative-cycle'; cycle: EdgeId[] }
+  /** A recursive call starts (BMSSP): find everything below `bound` reachable through `sources`. */
+  | { kind: 'call'; level: number; bound: number; sources: VertexId[]; limit: number }
+  /** FindPivots finished: the frontier `sources` shrank to `pivots`; `work` is everything it touched. */
+  | { kind: 'pivots'; pivots: VertexId[]; forest: EdgeId[]; work: VertexId[]; sources: VertexId[]; k: number; early: boolean }
+  /** The innermost call returns: `completed` are final, and every distance below `bound` is now known. */
+  | { kind: 'return'; level: number; bound: number; partial: boolean; completed: VertexId[] }
   | { kind: 'done' };
+
+/** One recursive call, as shown in a recursion-tree panel. */
+export interface CallRecord {
+  level: number;
+  bound: number;
+  sources: VertexId[];
+  /** Smallest distance among the sources when the call started. */
+  lower: number;
+  parent: number | null;
+  depth: number;
+  done: boolean;
+  /** Set on return. */
+  newBound?: number;
+  partial?: boolean;
+  completed?: number;
+}
 
 export type Emit = (event: TraceEvent) => void;
 
@@ -69,6 +91,13 @@ export interface VisualState {
   /** Relaxations performed so far (edges examined with a finite start distance). */
   relaxations: number;
   negativeCycle: EdgeId[] | null;
+  /** Recursive calls in the order they started, and the indices of the ones still running. */
+  calls: CallRecord[];
+  callStack: number[];
+  /** The latest FindPivots result inside the running call, if any. */
+  pivots: VertexId[] | null;
+  forest: EdgeId[] | null;
+  workSet: VertexId[] | null;
   done: boolean;
 }
 
@@ -89,6 +118,11 @@ export function initialState(n: number): VisualState {
     round: null,
     relaxations: 0,
     negativeCycle: null,
+    calls: [],
+    callStack: [],
+    pivots: null,
+    forest: null,
+    workSet: null,
     done: false,
   };
 }
@@ -103,6 +137,8 @@ export function cloneState(s: VisualState): VisualState {
     settledOrder: s.settledOrder.slice(),
     ignoredImprovement: s.ignoredImprovement && { ...s.ignoredImprovement },
     negativeCycle: s.negativeCycle && s.negativeCycle.slice(),
+    calls: s.calls.map((c) => ({ ...c })),
+    callStack: s.callStack.slice(),
   };
 }
 
@@ -162,6 +198,43 @@ export function applyEvent(s: VisualState, event: TraceEvent): void {
     case 'negative-cycle':
       s.negativeCycle = event.cycle.slice();
       break;
+    case 'call': {
+      const parent = s.callStack.length ? s.callStack[s.callStack.length - 1] : null;
+      s.calls.push({
+        level: event.level,
+        bound: event.bound,
+        sources: event.sources,
+        lower: Math.min(...event.sources.map((v) => s.dist[v])),
+        parent,
+        depth: s.callStack.length,
+        done: false,
+      });
+      s.callStack.push(s.calls.length - 1);
+      s.pivots = s.forest = s.workSet = null;
+      s.current = null;
+      break;
+    }
+    case 'pivots':
+      s.pivots = event.pivots;
+      s.forest = event.forest;
+      s.workSet = event.work;
+      s.current = null;
+      break;
+    case 'return': {
+      const index = s.callStack.pop();
+      if (index !== undefined) {
+        const call = s.calls[index];
+        s.calls[index] = { ...call, done: true, newBound: event.bound, partial: event.partial, completed: event.completed.length };
+      }
+      for (const v of event.completed) {
+        if (s.status[v] === 'settled') continue;
+        s.status[v] = 'settled';
+        s.settledOrder.push(v);
+      }
+      s.pivots = s.forest = s.workSet = null;
+      s.current = null;
+      break;
+    }
     case 'done':
       s.done = true;
       s.current = null;
@@ -179,6 +252,9 @@ function startsNewAction(event: TraceEvent): boolean {
     case 'relax':
     case 'source':
     case 'negative-cycle':
+    case 'call':
+    case 'pivots':
+    case 'return':
     case 'done':
       return true;
     case 'queue':

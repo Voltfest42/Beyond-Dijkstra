@@ -1,0 +1,116 @@
+import { BmsspFigure, FindPivotsFigure } from '../figures/BmsspFigures';
+import { FrontierFigure, SortingFigure } from '../figures/chapter3';
+import { Callout, DeepDive } from '../site/content/blocks';
+import { Term } from '../site/content/Term';
+
+## Dijkstra is a sorting machine
+
+Chapter 1 ended with Dijkstra's second habit: it settles vertices strictly in order of distance. That sounds like a nice property, but it is also a trap. It means Dijkstra can be used to *sort*.
+
+Take any list of numbers, make a source vertex, and give it one edge to a new vertex for each number, weighted by that number. Run Dijkstra, and the leaves come out in sorted order:
+
+<SortingFigure
+  number="3.1"
+  tryThis={<p>Press play, then type your own numbers (or press "Random numbers") and run it again. The "Settled, in order" list is always your numbers, sorted, and the distance line fills strictly from left to right.</p>}
+/>
+
+Sorting has a famous speed limit. An algorithm that can only *compare* numbers needs about **n log n** comparisons to sort n of them, and nothing can do better. So any algorithm that settles vertices in distance order, like Dijkstra, needs about n log n steps too. With the best <Term id="priority-queue">priority queues</Term>, Dijkstra takes about m + n log n steps: one for each edge, plus the cost of sorting. That second term is the **sorting barrier**.
+
+<DeepDive title="The fine print: which speed limit, exactly?">
+
+The barrier holds in the <Term id="comparison-model">comparison-addition model</Term>, where edge weights are arbitrary real numbers that an algorithm can only add and compare. That is what Dijkstra does, and what you want for a general-purpose algorithm.
+
+If weights are small *integers*, bit tricks can sidestep comparisons altogether, and the barrier has been beaten for decades. Thorup found a linear-time algorithm for undirected graphs with integer weights in 1999, and an O(m + n log log n) one for directed graphs in 2003. The open question was general real-valued weights. In 2023, Duan, Mao, Shu and Yin broke the barrier for *undirected* graphs with a randomized algorithm. Directed graphs remained.
+
+</DeepDive>
+
+## The 2024 twist: Dijkstra is the best possible
+
+You might expect the next part of the story to be "and then someone found a faster Dijkstra". Instead, in 2024 Bernhard Haeupler, Richard Hladík, Václav Rozhoň, Robert Tarjan and Jakub Tětek proved that Dijkstra **cannot be beaten**, in a very strong sense.
+
+Usually "optimal" means "best in the worst case": no algorithm does better on the hardest possible graph. They proved something stronger, called **universal optimality**. Give Dijkstra a new kind of heap, one that makes recently added items cheap to take out, and it becomes the best possible algorithm *on every single graph*, for any edge weights. Their paper won the best paper award at FOCS 2024.
+
+But read the claim carefully. Dijkstra is optimal for the problem of **listing the vertices in order of distance**. That is exactly the sorting from Section 3.1.
+
+<Callout title="The loophole">
+
+To beat Dijkstra, an algorithm must compute the distances **without putting all the vertices in order**. Sorting everything is the expensive part, and the job never actually asked for it.
+
+</Callout>
+
+## Where the time goes: the frontier
+
+Where does Dijkstra do all that sorting? In its <Term id="frontier">frontier</Term>, the priority queue of vertices that have a tentative distance but aren't settled yet. Every vertex passes through it, and each one costs about log₂ n comparisons to keep in order. Here is the frontier of a real run, measured in your browser on graphs with up to 100,000 vertices:
+
+<FrontierFigure
+  number="3.2"
+  tryThis={<p>Switch between 1K, 10K and 100K vertices and watch "Comparisons per vertex": each time the graph gets 10× bigger, every vertex costs a few more comparisons, tracking log₂ n. That growing cost per vertex is the sorting barrier in action.</p>}
+/>
+
+The frontier often holds hundreds or thousands of vertices at once, and Dijkstra keeps all of them in exact order, even though it only ever needs the smallest one next. In 2025, Ran Duan, Jiayi Mao, Xiao Mao, Xinkai Shu and Longhui Yin found a way around this. Their algorithm runs in **O(m log^(2/3) n)** time, the first to beat Dijkstra on sparse directed graphs. It won the best paper award at STOC 2025. It rests on two ideas.
+
+## Idea 1: shrink the frontier with a little Bellman–Ford
+
+Bellman–Ford, from Chapter 2, never sorts anything: it just relaxes edges in rounds. It is slow when routes are long, but it's fast for routes only a few edges long. So the new algorithm runs **just k rounds of Bellman–Ford from the frontier** (a step called *FindPivots*):
+
+- Every vertex whose best route from the frontier has fewer than k edges now has its final distance, with no sorting at all.
+- The routes found form trees hanging off the frontier vertices. A frontier vertex whose tree is *small* (fewer than k vertices) is done: its whole tree was just finished.
+- Only frontier vertices with *big* trees, at least k vertices, still matter. These are the <Term id="pivot">pivots</Term>, and only they go on to the sorted structure.
+
+Each pivot stands for at least k finished vertices, so at most about **1 in k** vertices ever needs sorting.
+
+<FindPivotsFigure
+  number="3.3"
+  tryThis={<p>With k = 3, step through to the end: the frontier of four shrinks to two pivots, A and C. B and D sit in small trees, so they are finished. Then try k = 1 and k = 2: the search quickly spreads too wide (past k × 4 vertices), so FindPivots gives up early and keeps every frontier vertex. Choosing k is a balancing act.</p>}
+/>
+
+## Idea 2: divide and conquer by distance
+
+The second idea replaces Dijkstra's single, perfectly sorted queue. The algorithm, called *BMSSP* (bounded multi-source shortest paths), works on **bands of distance**:
+
+1. Run FindPivots on the current frontier to shrink it to pivots.
+2. Put the pivots into a special structure that is only **partly sorted**. It keeps vertices in blocks that are in order relative to each other, but leaves each block unsorted inside.
+3. Repeatedly **pull a batch** of the smallest pivots, together with a distance bound, and solve "everything below this bound, reached through this batch" with a *recursive call* one level down, on a batch about 2^t times smaller.
+4. At the bottom (level 0), a mini-Dijkstra finishes just k + 1 vertices.
+
+Watch the whole thing on a 16-vertex graph. The shaded band on the distance line is the range the current call is responsible for, and the panel on the right is the tree of calls:
+
+<BmsspFigure
+  number="3.4"
+  tryThis={<p>Use "Skip to the next call or return" to follow the recursion. Watch the band on the distance line: each call only ever works below its bound. And notice the pivots: in the call from I, G, K and J, only I and G become pivots. K and J are finished during FindPivots, with no sorting needed.</p>}
+/>
+
+<DeepDive title="Where O(m log^(2/3) n) comes from">
+
+The algorithm has two knobs: **k**, the number of Bellman–Ford rounds, and **t**, which sets how much smaller each level's batches are (2^t times). The recursion is about log n / t levels deep. Across one level of recursion, the work is roughly:
+
+- **FindPivots:** k rounds of Bellman–Ford over the vertices in play, about **k** per vertex.
+- **The partly sorted structure:** only pivots enter it, at most 1 in k vertices, and each costs about **t** to place. That is about **t / k** per vertex.
+
+So each level costs about n × (k + t/k), and there are log n / t levels. The paper picks k = ⌊log^(1/3) n⌋ and t = ⌊log^(2/3) n⌋, which makes both terms about log^(1/3) n:
+
+n × (k + t/k) × (log n / t) ≈ n × log^(1/3) n × log^(1/3) n = **n log^(2/3) n**
+
+To make "n" and "m" interchangeable, the paper first transforms the graph so that every vertex has at most two edges in and two out. For a million vertices, the formulas give k = 2, t = 7 and just 3 levels of recursion. That is why the figure above lets you choose larger values: on 16 vertices the paper's choices (k = 1, t = 2) are too small for anything visible to happen.
+
+</DeepDive>
+
+<DeepDive title="The partly sorted structure, in more detail">
+
+The structure, called D in the paper, supports three operations:
+
+- **Insert** a vertex with its tentative distance. It goes into the block whose range covers it, and a block that grows past M items is split in two around its median.
+- **Batch-prepend** a group of vertices that are all smaller than everything inside. They become new blocks at the front, with no searching needed.
+- **Pull** the M smallest vertices plus a bound that separates them from the rest. Only the first few blocks need looking at, never the whole structure.
+
+Each block is internally unsorted. That's the point: work is spent only on the order that's actually needed. This site's version follows that design, but splits blocks by sorting them instead of the paper's linear-time median selection, which costs a little more and changes no result.
+
+Every implementation detail here is checked by automated tests. The algorithm is compared against Dijkstra on thousands of random graphs with many tied distances, the structure against a simple sorted list, and the paper's promises (such as "at most |W| / k pivots") are checked inside every call.
+
+</DeepDive>
+
+<Callout kind="ahead">
+
+So the new algorithm beats Dijkstra in theory. Does it win in practice? The next part of this chapter races the two in your browser, and covers what happened in 2026. It is still being written.
+
+</Callout>

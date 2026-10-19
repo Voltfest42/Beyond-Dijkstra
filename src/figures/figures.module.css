@@ -139,3 +139,25 @@
   font-size: 0.82rem;
   color: var(--text-muted);
 }
+
+.inputLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.textInput {
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  width: min(300px, 60vw);
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.textInput[aria-invalid='true'] {
+  border-color: var(--edge-negative);
+}
