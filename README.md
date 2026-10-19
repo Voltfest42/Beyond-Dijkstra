@@ -14,7 +14,9 @@ Requires Node 20.19 or later (developed on Node 24).
 ```bash
 npm install
 npm run dev        # local dev server at http://localhost:5173
-npm test           # unit + property tests
+npm test           # unit + property tests (Vitest)
+npm run e2e        # end-to-end + accessibility tests on the production build (Playwright + axe)
+                   # first time only: npx playwright install chromium
 npm run lint
 npm run build      # type-check and build to dist/
 ```
@@ -31,6 +33,7 @@ src/bench/     the Dijkstra vs. 2025-algorithm race (runs in a Web Worker) and i
 src/playground/ the graph editor and algorithm runner
 scripts/       record-race.ts: re-records src/bench/reference.json (npx tsx scripts/record-race.ts)
 tests/         unit and property tests (every algorithm vs. an independent reference)
+e2e/           Playwright smoke tests: every page and demo, the playground, keyboard use, WCAG 2.1 AA checks
 infra/         AWS CDK app: private S3 bucket + CloudFront
 docs/          research notes and plan
 ```

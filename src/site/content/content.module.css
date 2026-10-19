@@ -133,7 +133,7 @@
 }
 
 .ahead .calloutLabel {
-  color: var(--state-frontier);
+  color: var(--text-warm);
 }
 
 .note {

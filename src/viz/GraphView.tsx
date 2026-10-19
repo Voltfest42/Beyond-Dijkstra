@@ -74,7 +74,7 @@ export function GraphView({
   const weightOf = (e: EdgeId) => (edgeWeights ? edgeWeights[e] : graph.edgeWeight[e]);
 
   return (
-    <svg className={styles.svg} viewBox={viewBox} role="img" aria-label={ariaLabel}>
+    <svg className={styles.svg} viewBox={viewBox} role={onVertexClick ? 'group' : 'img'} aria-label={ariaLabel}>
       {clusters && (
         <g aria-hidden="true">
           {clusters.map((cluster, c) => {
@@ -96,7 +96,7 @@ export function GraphView({
           })}
         </g>
       )}
-      <g>
+      <g aria-hidden={onVertexClick ? true : undefined}>
         {edges.map((geo, e) => {
           const weight = weightOf(e);
           const text = formatWeight(weight);
@@ -159,9 +159,10 @@ export function GraphView({
               }
               role={onVertexClick ? 'button' : undefined}
               tabIndex={onVertexClick ? 0 : undefined}
-              aria-label={onVertexClick ? (vertexActionLabel?.(v) ?? label) : undefined}
+              aria-label={onVertexClick ? `${label}${source === v ? ' (the start)' : ''}, distance ${formatDist(dist)}. ${vertexActionLabel?.(v) ?? ''}`.trim() : undefined}
               aria-pressed={onVertexClick && selected !== null ? selected === v : undefined}
             >
+              <g aria-hidden={onVertexClick ? true : undefined}>
               {(state.current === v || selected === v) && (
                 <circle r={NODE_RADIUS + 7} className={state.current === v ? styles.halo : styles.selectRing} />
               )}
@@ -170,11 +171,6 @@ export function GraphView({
               <text className={styles.label} dy="0.35em">
                 {label}
               </text>
-              {source === v && (
-                <text className={styles.sourceTag} y={NODE_RADIUS + 16}>
-                  start
-                </text>
-              )}
               {note !== null && (
                 <text
                   className={styles.note}
@@ -207,10 +203,17 @@ export function GraphView({
                   </text>
                 </g>
               )}
+              </g>
             </g>
           );
         })}
       </g>
+      {/* Drawn outside the vertex so it isn't part of a clickable vertex's name. */}
+      {source !== undefined && positions[source] && (
+        <text className={styles.sourceTag} x={positions[source].x} y={positions[source].y + NODE_RADIUS + 16} aria-hidden="true">
+          start
+        </text>
+      )}
     </svg>
   );
 }

@@ -4,6 +4,10 @@
 
 > **The assignment, verbatim:** "Prepare an interactive demo, story and presentation about the recent advances (2022-2025) around the classical Dijkstra algorithm: generalization to negative edges; faster-than-Dijkstra new algorithm."
 
+## Status
+
+**Complete (19 Oct 2026).** All seven stages are done and live at https://d2phdikb7jctfx.cloudfront.net. Stretch goals (compare mode, game-map mode, quizzes, quick tour, custom domain) were not built.
+
 ## Decisions so far
 
 | Topic | Decision |

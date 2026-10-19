@@ -8,6 +8,10 @@
   --text-muted: #5b6270;
   --border: #e3e1da;
   --accent: #2563eb;
+  /* Filled buttons with white text (≥ 4.5:1 in both themes). */
+  --accent-fill: #2563eb;
+  /* Amber for small text such as labels (the state amber is too light for text). */
+  --text-warm: #b45309;
 
   /* Algorithm state colours, shared by every figure. */
   --state-unvisited: #a3a8b3;
@@ -33,6 +37,8 @@
     --text-muted: #a0a6b2;
     --border: #2e323a;
     --accent: #6b9bff;
+    --accent-fill: #2563eb;
+    --text-warm: #fbbf24;
 
     --state-unvisited: #6b7280;
     --state-frontier: #fbbf24;

@@ -73,7 +73,7 @@
 }
 
 .segmented [aria-pressed='true'] {
-  background: var(--accent);
+  background: var(--accent-fill);
   border-color: var(--accent);
   color: #fff;
 }

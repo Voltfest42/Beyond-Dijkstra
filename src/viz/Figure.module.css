@@ -68,7 +68,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--state-frontier);
+  color: var(--text-warm);
 }
 
 .legend {

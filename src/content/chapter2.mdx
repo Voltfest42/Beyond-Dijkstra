@@ -137,7 +137,7 @@ In 2022, Aaron Bernstein, Danupon Nanongkai and Christian Wulff-Nilsen showed ho
 - Each round is one call of the method above (called *ScaleDown* in the paper), and each call halves how negative any edge may be.
 - Once every edge is at least −1, adding 1 to every edge makes them all non-negative. Because of the factor 2n, adding 1 per edge can't change which route is shortest. One run of Dijkstra finishes the job.
 
-The result runs in **O(m log⁸ n · log W)** time, where W is the size of the most negative weight. That is near-linear: m times a handful of log factors, which come from the scaling rounds, the recursion depth, the random cutting and Dijkstra's priority queue. The algorithm is randomized, but it never gives a wrong answer: the randomness only affects how long it takes. It also detects negative cycles: if one exists, some round's clean-up keeps improving forever, and the algorithm stops and reports it.
+The result runs in **O(m log⁸ n · log W)** time, where W is the size of the most negative weight. That is near-linear: m times a handful of log factors, which come from the scaling rounds, the recursion depth, the random cutting and Dijkstra's priority queue. The algorithm is randomized, but in its full form it never gives a wrong answer: the randomness only affects how long it takes. It also handles negative cycles. If one exists, the clean-up could keep improving distances forever, so the full algorithm watches for that and returns the cycle instead.
 
 <DeepDive title="Why a tight cluster can't hide many negative edges">
 
@@ -153,13 +153,13 @@ For the edges that were cut, the randomness does the work. An edge of length ℓ
 
 The figure above runs real code from this site: the clustering, the recursion, the between-cluster sweep and the hybrid, on the graph you see. Its one simplification is that it aims straight for "every edge ≥ 0" in a single pass, with cluster sizes tuned for a 14-vertex graph.
 
-The site also implements the full algorithm with the scaling loop, and the summary at the end of the figure reports its numbers. It is checked automatically against an independent method on 1,500 random graphs, including graphs with negative cycles. Its clustering step is simpler than the paper's: the paper adds a recursive clean-up that guarantees the clusters are tight in both directions, which matters for the running-time proof but not for correctness.
+The site also implements the full algorithm with the scaling loop, and the summary at the end of the figure reports its numbers. It is checked automatically against an independent method on 1,500 random graphs, including graphs with negative cycles. Its clustering step is simpler than the paper's. The paper first sorts vertices by how many random centres are close to them, and recurses inside each ball, which guarantees that the clusters are tight in both directions. That matters for the running-time proof, but not for correctness.
 
 </DeepDive>
 
 ## What happened next
 
-The 2022 paper opened the floodgates. Within a year, Bringmann, Cassis and Fischer removed almost six of the log factors. Later work sped up the clustering step itself. And in 2025, an engineered implementation turned out to be up to almost 100× faster than the classic method on the hardest test graphs. So unlike many theory results, this one looks practical.
+The 2022 paper opened the floodgates. About a year later, Bringmann, Cassis and Fischer removed almost six of the log factors. Later work sped up the clustering step itself. And in 2025, an engineered implementation turned out to be up to almost 100× faster than the classic method on the hardest test graphs. So unlike many theory results, this one looks practical.
 
 There is also a harder version of the problem: weights that are arbitrary real numbers, where the running time may not depend on how big the numbers are. There, nobody had beaten Bellman–Ford's n × m since the 1950s, until Jeremy Fineman did in 2024. Since then the bound has kept falling, and a July 2026 preprint claims almost-linear time for this version too.
 

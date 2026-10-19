@@ -11,7 +11,7 @@ In 1956, Dijkstra's algorithm came with two built-in habits. Between 2022 and 20
 | **The wall** | Wrong answers with <Term id="negative-edge">negative edges</Term>. The safe fallback, Bellman–Ford, takes n × m steps. | Never faster than sorting: about m + n log n. |
 | **The key insight** | Heights (potentials) can make every edge non-negative without changing any shortest route. Random clusters make them cheap to find. | Most of the sorting isn't needed. A little Bellman–Ford finishes most vertices, and only "pivots" need ordering. |
 | **The breakthrough** | Bernstein, Nanongkai and Wulff-Nilsen, 2022: near-linear time | Duan, Mao, Mao, Shu and Yin, 2025: O(m log^(2/3) n) |
-| **In practice** | Promising: an engineered version beats the classic method by up to almost 100× on hard inputs. | Not yet: Dijkstra is still 3–4× faster in the best published implementation. |
+| **In practice** | Promising: an engineered version beats the classic method by up to almost 100× on hard inputs. | Not yet: Dijkstra was still 3–4× faster in a published C++ study. |
 | **Since then** | Real-valued weights: Bellman–Ford finally beaten (2024), and an almost-linear preprint (2026) | Down to O(m √(log n · log log n)) (2026) |
 
 Here is every result from this story in one place:
@@ -20,7 +20,7 @@ Here is every result from this story in one place:
   number="4.1"
   title="Shortest paths, 1955–2026"
   tracks={['classic', 'integer', 'real', 'sorting']}
-  tryThis={<p>The four buttons above the list each show one line of work. Notice the long quiet stretch from the 1990s to 2022, followed by a burst of results. Click any entry for details and a link to the paper.</p>}
+  tryThis={<p>The four buttons above the list each show one line of work. Notice how little changed between the 1990s and 2020, and the burst of results from 2022 on. Click any entry for details and a link to the paper.</p>}
 />
 
 ## Theory versus practice
@@ -28,7 +28,7 @@ Here is every result from this story in one place:
 It's tempting to judge an algorithm only by whether it is faster today. These results show why that misses the point.
 
 - **The negative-weight line is heading into practice.** Its building blocks (clustering, potentials and the Dijkstra/Bellman–Ford hybrid) are simple enough to engineer. Within three years of the 2022 paper, a tuned implementation was beating the classic method on the hardest test graphs.
-- **The sorting-barrier line is pure theory, for now.** Its gain is a few log factors, and on any graph that fits in a computer, its extra machinery costs more than it saves. But it overturned a belief that had lasted for decades, and it gave researchers new tools that are already being refined.
+- **The sorting-barrier line is pure theory, for now.** Its gain is a few log factors, and on every graph tested so far, its extra machinery costs more than it saves. But it overturned a belief that had lasted for decades, and it gave researchers new tools that are already being refined.
 
 Both results also share a lesson: they were built from **old, simple pieces**, namely Dijkstra, Bellman–Ford, potentials and recursion, combined in new ways. Neither needed exotic mathematics.
 

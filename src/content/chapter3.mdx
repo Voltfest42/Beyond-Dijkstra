@@ -30,7 +30,7 @@ If weights are small *integers*, bit tricks can sidestep comparisons altogether,
 
 You might expect the next part of the story to be "and then someone found a faster Dijkstra". Instead, in 2024 Bernhard Haeupler, Richard Hladík, Václav Rozhoň, Robert Tarjan and Jakub Tětek proved that Dijkstra **cannot be beaten**, in a very strong sense.
 
-Usually "optimal" means "best in the worst case": no algorithm does better on the hardest possible graph. They proved something stronger, called **universal optimality**. Give Dijkstra a new kind of heap, one that makes recently added items cheap to take out, and it becomes the best possible algorithm *on every single graph*, for any edge weights. Their paper won the best paper award at FOCS 2024.
+Usually "optimal" means "best in the worst case": no algorithm does better on the hardest possible graph. They proved something stronger, called **universal optimality**. Give Dijkstra a new kind of heap, one that makes recently added items cheap to take out, and it becomes the best possible algorithm *on every single graph*: whatever the shape of the graph, no algorithm can do better against the hardest edge weights for that shape. Their paper won the best paper award at FOCS 2024.
 
 But read the claim carefully. Dijkstra is optimal for the problem of **listing the vertices in order of distance**. That is exactly the sorting from Section 3.1.
 
@@ -59,7 +59,7 @@ Bellman–Ford, from Chapter 2, never sorts anything: it just relaxes edges in r
 - The routes found form trees hanging off the frontier vertices. A frontier vertex whose tree is *small* (fewer than k vertices) is done: its whole tree was just finished.
 - Only frontier vertices with *big* trees, at least k vertices, still matter. These are the <Term id="pivot">pivots</Term>, and only they go on to the sorted structure.
 
-Each pivot stands for at least k finished vertices, so at most about **1 in k** vertices ever needs sorting.
+Each pivot's tree holds at least k of the vertices the search touched, so there is at most **1 pivot for every k** of them. That is how much less sorting is needed.
 
 <FindPivotsFigure
   number="3.3"

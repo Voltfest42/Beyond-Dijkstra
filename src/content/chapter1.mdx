@@ -100,7 +100,7 @@ Dijkstra does n *extract-min* operations (one per settled vertex) and up to m *d
 
 The n log n term is the sorting. For dense graphs (m close to n²) the m term dominates anyway. For sparse graphs such as road networks and game maps, m is close to n, and the n log n term is the bottleneck.
 
-The speed limit belongs to the <Term id="comparison-model">comparison-addition model</Term>, where distances are arbitrary real numbers that can only be compared and added. With small *integer* weights, bit tricks have beaten it since 1999 (Thorup). The open question was general weights.
+The speed limit belongs to the <Term id="comparison-model">comparison-addition model</Term>, where distances are arbitrary real numbers that can only be compared and added. With *integer* weights, algorithms that work on the bits of the numbers have long beaten it; for example, Thorup found a linear-time algorithm for undirected graphs in 1999. The open question was general real-valued weights.
 
 </DeepDive>
 
