@@ -2,7 +2,7 @@
 
 An interactive story about the 2022–2025 breakthroughs around Dijkstra's shortest-path algorithm: handling **negative edges** in near-linear time, and **beating the sorting barrier** on directed graphs. Every idea comes with a live, step-through demo.
 
-**Live site:** https://d2phdikb7jctfx.cloudfront.net
+**Live site:** https://dijkstra.moving-parts.dev (part of [Moving Parts](https://moving-parts.dev))
 
 - [docs/research.md](docs/research.md): the research behind the story, with sources
 - [docs/plan.md](docs/plan.md): the project plan, the stages and the architecture
