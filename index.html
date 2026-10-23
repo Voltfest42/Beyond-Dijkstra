@@ -8,7 +8,39 @@
       content="An interactive story about the 2022–2025 breakthroughs around Dijkstra's shortest-path algorithm: negative edges and the sorting barrier."
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Beyond Dijkstra</title>
+    <!-- The start page's title; App.tsx sets each page's own title once the app runs. -->
+    <title>Beyond Dijkstra: shortest paths, 2022–2025</title>
+    <link rel="canonical" href="https://dijkstra.moving-parts.dev/" />
+
+    <!-- Link previews (Open Graph and X/Twitter). The image is rendered in the Moving Parts project. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Moving Parts" />
+    <meta property="og:title" content="Beyond Dijkstra: shortest paths, 2022–2025" />
+    <meta property="og:description" content="The 2022–2025 breakthroughs in shortest paths, explained with live demos." />
+    <meta property="og:url" content="https://dijkstra.moving-parts.dev/" />
+    <meta property="og:image" content="https://dijkstra.moving-parts.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Beyond Dijkstra: a small graph being explored, beside the title" />
+    <meta property="og:locale" content="en" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Structured data: a free, interactive educational resource, part of Moving Parts. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        "name": "Beyond Dijkstra",
+        "url": "https://dijkstra.moving-parts.dev/",
+        "description": "An interactive story about the 2022–2025 breakthroughs around Dijkstra's shortest-path algorithm: negative edges and the sorting barrier.",
+        "learningResourceType": "Interactive explainer",
+        "educationalLevel": "Advanced",
+        "about": ["Shortest path problem", "Dijkstra's algorithm", "Graph algorithms"],
+        "inLanguage": "en",
+        "isAccessibleForFree": true,
+        "isPartOf": { "@type": "WebSite", "name": "Moving Parts", "url": "https://moving-parts.dev/" }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
